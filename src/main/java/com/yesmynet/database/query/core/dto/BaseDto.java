@@ -1,0 +1,17 @@
+package com.yesmynet.database.query.core.dto;
+/**
+ * 表示DTO的基类。
+ * @author 刘庆志
+ *
+ */
+public class BaseDto implements java.io.Serializable
+{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
+	 * 主键
+	 */
+	protected String id;
+}

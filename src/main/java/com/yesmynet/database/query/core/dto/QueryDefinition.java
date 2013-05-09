@@ -17,5 +17,15 @@ public class QueryDefinition  extends BaseDto
 	 * 查询定义的所有参数
 	 */
 	private List<ParameterDefinition> parameters;
+
+	public List<ParameterDefinition> getParameters()
+	{
+		return parameters;
+	}
+
+	public void setParameters(List<ParameterDefinition> parameters)
+	{
+		this.parameters = parameters;
+	}
 	
 }

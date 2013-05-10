@@ -21,5 +21,5 @@ public interface Query
 	 * @param parameters 根据查询定义中定义的参数，对这些参数收集了用户输入的值
 	 * @return
 	 */
-	public QueryReult doInQuery(JdbcTemplate jdbcTemplate,List<ParameterWithValue> parameters);
+	public QueryReult doInQuery(JdbcTemplate jdbcTemplate,List<ParameterRuntime> parameters);
 }

@@ -17,18 +17,6 @@ import com.yesmynet.database.query.core.dto.QueryDefinition;
 public interface QueryExecutorService
 {
 	/**
-	 * 根据ID得到表示查询定义的对象。
-	 * @param queryId
-	 * @return
-	 */
-	public QueryDefinition getQueryParameters(String queryId);
-	/**
-	 * 根据ID得到表示查询的实例
-	 * @param id
-	 * @return
-	 */
-	public Query getQueryInstance(String id);
-	/**
 	 * 运行一个查询实例
 	 * @param query 要运行的查询的实例
 	 * @param parameters 运行查询时的参数

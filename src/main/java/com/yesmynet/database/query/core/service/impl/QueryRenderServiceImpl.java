@@ -7,7 +7,7 @@ import java.util.Map;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import com.yesmynet.database.query.core.dto.ParameterDefinition;
+import com.yesmynet.database.query.core.dto.Parameter;
 import com.yesmynet.database.query.core.dto.ParameterHtmlType;
 import com.yesmynet.database.query.core.dto.QueryDefinition;
 import com.yesmynet.database.query.core.service.QueryRenderService;
@@ -22,10 +22,10 @@ public class QueryRenderServiceImpl implements QueryRenderService
 	public String getQueryHtml(QueryDefinition query)
 	{
 		String re="";
-		List<ParameterDefinition> parameters = query.getParameters();
+		List<Parameter> parameters = query.getParameters();
 		if(!CollectionUtils.isEmpty(parameters))
 		{
-			for(ParameterDefinition define:parameters)
+			for(Parameter define:parameters)
 			{
 				String value=define.getValue();
 			}
@@ -37,7 +37,7 @@ public class QueryRenderServiceImpl implements QueryRenderService
 	 * @param parameter 查询参数的定义
 	 * @return 用来显示参数的html字符串，如，< input ...>
 	 */
-	protected String getParameterHtml(ParameterDefinition parameter)
+	protected String getParameterHtml(Parameter parameter)
 	{
 		String re="";
 		ParameterHtmlType parameterHtmlType = parameter.getHtmlType();
@@ -54,7 +54,7 @@ public class QueryRenderServiceImpl implements QueryRenderService
 	 * @param parameterDefine
 	 * @return
 	 */
-	protected String getParameterName(ParameterDefinition parameterDefine) 
+	protected String getParameterName(Parameter parameterDefine) 
 	{
 		String re=parameterDefine.getCustomName();
 		if(!StringUtils.hasText(re))

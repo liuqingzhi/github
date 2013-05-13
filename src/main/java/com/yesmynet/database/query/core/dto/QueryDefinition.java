@@ -16,17 +16,17 @@ public class QueryDefinition  extends BaseDto
 	/**
 	 * 查询定义的所有参数
 	 */
-	private List<ParameterDefinition> parameters;
+	private List<Parameter> parameters;
 	/**
 	 * 显示查询定义后要额外显示的html
 	 */
 	private String afterParameterHtml;
-	public List<ParameterDefinition> getParameters()
+	public List<Parameter> getParameters()
 	{
 		return parameters;
 	}
 
-	public void setParameters(List<ParameterDefinition> parameters)
+	public void setParameters(List<Parameter> parameters)
 	{
 		this.parameters = parameters;
 	}

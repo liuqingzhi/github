@@ -2,7 +2,7 @@ package com.yesmynet.database.query.core.service;
 
 import java.util.List;
 
-import com.yesmynet.database.query.core.dto.ParameterDefinition;
+import com.yesmynet.database.query.core.dto.Parameter;
 import com.yesmynet.database.query.core.dto.Query;
 import com.yesmynet.database.query.core.dto.QueryDefinition;
 

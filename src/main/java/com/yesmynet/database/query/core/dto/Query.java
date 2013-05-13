@@ -18,8 +18,7 @@ public interface Query
 	/**
 	 * 要在数据库中执行的操作。
 	 * @param jdbcTemplate 利用本参数操作数据库
-	 * @param parameters 根据查询定义中定义的参数，对这些参数收集了用户输入的值
 	 * @return
 	 */
-	public QueryReult doInQuery(JdbcTemplate jdbcTemplate,List<ParameterRuntime> parameters);
+	public QueryReult doInQuery(JdbcTemplate jdbcTemplate);
 }

@@ -21,6 +21,10 @@ public class QueryDefinition  extends BaseDto
 	 * 显示查询定义后要额外显示的html
 	 */
 	private String afterParameterHtml;
+	/**
+	 * 是否显示“执行查询”的按钮
+	 */
+	private Boolean showExecuteButton;
 	public List<Parameter> getParameters()
 	{
 		return parameters;
@@ -40,5 +44,15 @@ public class QueryDefinition  extends BaseDto
 	{
 		this.afterParameterHtml = afterParameterHtml;
 	}
+
+    public Boolean getShowExecuteButton()
+    {
+        return showExecuteButton;
+    }
+
+    public void setShowExecuteButton(Boolean showExecuteButton)
+    {
+        this.showExecuteButton = showExecuteButton;
+    }
 	
 }

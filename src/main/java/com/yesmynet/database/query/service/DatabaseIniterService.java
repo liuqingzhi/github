@@ -1,4 +1,4 @@
-package com.yesmynet.database.query.utils;
+package com.yesmynet.database.query.service;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -18,7 +18,7 @@ import com.ibatis.sqlmap.client.SqlMapExecutor;
  * @author 刘庆志
  *
  */
-public class DatabaseIniter extends SqlMapClientDaoSupport 
+public class DatabaseIniterService extends SqlMapClientDaoSupport 
 {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	/**

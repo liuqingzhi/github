@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap>
+    
+    <!--检查一下，数据库是否已经初始化了-->
+    <select id="getDBInitedData" resultClass="java.util.HashMap" parameterClass="java.util.Map">
+       	select * From m_sys_init
+    </select>
+	
+	
+	<statement id="createTableSysInit">
+		CREATE TABLE m_sys_init
+	(ID INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT PEOPLE_PK PRIMARY KEY, 
+	inited_flag INT DEFAULT 0,
+	inited_time date
+	)
+	</statement>
+	
+</sqlMap>

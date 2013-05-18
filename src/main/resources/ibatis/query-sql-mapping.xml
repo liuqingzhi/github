@@ -12,8 +12,13 @@
 		CREATE TABLE m_sys_init
 	(ID INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT PEOPLE_PK PRIMARY KEY, 
 	inited_flag INT DEFAULT 0,
-	inited_time date
+	inited_time TIMESTAMP
 	)
 	</statement>
-	
+	<insert id="insertSysInit" parameterClass="java.util.Map">
+        insert into m_sys_init 
+        (inited_flag,inited_time) 
+        values(1,CURRENT_TIMESTAMP)
+          
+    </insert>
 </sqlMap>

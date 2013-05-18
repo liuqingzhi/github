@@ -34,7 +34,7 @@ public class DatabaseIniter extends SqlMapClientDaoSupport
 	}
 	private boolean dbinited()
 	{
-		boolean re=true;
+		boolean re=false;
 		
 		Map queryForObject=null;
 		try
@@ -46,7 +46,16 @@ public class DatabaseIniter extends SqlMapClientDaoSupport
 			logger.debug("查询出的数据=",e);//JSONObject.fromObject(queryForObject));
 			re=false;
 		}
-		logger.debug("查询出的数据=",JSONObject.fromObject(queryForObject));
+		logger.debug("查询出的数据={}",JSONObject.fromObject(queryForObject));
+		if(queryForObject!=null)
+		{
+			Object object = queryForObject.get("INITED_FLAG");
+			logger.debug("初始化标志={}",object);
+			if("1".equals(object.toString()))
+			{
+				re=true;
+			}
+		}
 		
 		return re;
 		
@@ -54,6 +63,7 @@ public class DatabaseIniter extends SqlMapClientDaoSupport
 	private void initDB()
 	{
 		this.getSqlMapClientTemplate().update("createTableSysInit");
+		this.getSqlMapClientTemplate().insert("insertSysInit");
 		
 	}
 	

@@ -8,6 +8,7 @@ PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN"
 <settings cacheModelsEnabled="true" enhancementEnabled="true"
 		lazyLoadingEnabled="true" errorTracingEnabled="true" maxRequests="128"
 		maxSessions="64" maxTransactions="20" useStatementNamespaces="true" />
-		
+	
+	<sqlMap resource="ibatis/init-sql-mapping.xml"/>	
    <sqlMap resource="ibatis/query-sql-mapping.xml"/>
 </sqlMapConfig>

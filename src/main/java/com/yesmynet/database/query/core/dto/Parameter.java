@@ -15,6 +15,14 @@ public class Parameter extends BaseDto
 	 */
 	private static final long serialVersionUID = 1L;
 	/**
+	 * 标题
+	 */
+	private String title;
+	/**
+	 * 描述
+	 */
+	private String description;
+	/**
 	 * 参数显示时使用的html类型，如：一个单行文本框或一个多行文本框。
 	 */
 	private ParameterHtmlType htmlType;
@@ -36,6 +44,22 @@ public class Parameter extends BaseDto
 	 * 参数运行时的值
 	 */
 	private String value;
+	public String getTitle()
+	{
+		return title;
+	}
+	public void setTitle(String title)
+	{
+		this.title = title;
+	}
+	public String getDescription()
+	{
+		return description;
+	}
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
 	/**
 	 * 参数显示时的html类型，如:一个文本框或者一个多行文本框。
 	 * @author 刘庆志

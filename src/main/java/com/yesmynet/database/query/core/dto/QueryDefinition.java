@@ -14,6 +14,14 @@ import java.util.List;
 public class QueryDefinition  extends BaseDto
 {
 	/**
+	 * 名称
+	 */
+	private String name;
+	/**
+	 * 描述
+	 */
+	private String description;
+	/**
 	 * 查询定义的所有参数
 	 */
 	private List<Parameter> parameters;
@@ -25,34 +33,44 @@ public class QueryDefinition  extends BaseDto
 	 * 是否显示“执行查询”的按钮
 	 */
 	private Boolean showExecuteButton;
+	public String getName()
+	{
+		return name;
+	}
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+	public String getDescription()
+	{
+		return description;
+	}
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
 	public List<Parameter> getParameters()
 	{
 		return parameters;
 	}
-
 	public void setParameters(List<Parameter> parameters)
 	{
 		this.parameters = parameters;
 	}
-
 	public String getAfterParameterHtml()
 	{
 		return afterParameterHtml;
 	}
-
 	public void setAfterParameterHtml(String afterParameterHtml)
 	{
 		this.afterParameterHtml = afterParameterHtml;
 	}
-
     public Boolean getShowExecuteButton()
     {
         return showExecuteButton;
     }
-
     public void setShowExecuteButton(Boolean showExecuteButton)
     {
         this.showExecuteButton = showExecuteButton;
     }
-	
 }

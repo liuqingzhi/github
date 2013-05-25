@@ -5,6 +5,9 @@
 
 	<bean class="com.yesmynet.database.query.service.DatabaseIniterService" init-method="init">
 		<property name="sqlMapClientTemplate" ref="sqlMapClientTemplate"></property>
+		<property name="sqlFile" value="classpath:databaseUpdate.sql"></property>
+		<property name="expectedDatabaseVersion" value="1"></property>
+		
 	</bean>
 
 </beans>

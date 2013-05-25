@@ -1,0 +1,6 @@
+CREATE TABLE m_sys_database_init
+	(ID INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT PEOPLE_PK PRIMARY KEY, 
+	current_Version INT DEFAULT 0,
+	last_update_time TIMESTAMP
+	)
+	;

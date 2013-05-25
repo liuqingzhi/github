@@ -1,18 +1,37 @@
 package com.yesmynet.database.query.service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.sql.DataSource;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.ibatis.SqlMapClientCallback;
 import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.StringUtils;
 
 import com.ibatis.sqlmap.client.SqlMapExecutor;
+import com.yesmynet.database.query.dto.DBUpdateDTO;
 /**
  * 初始始化数据库
  * @author 刘庆志
@@ -21,6 +40,14 @@ import com.ibatis.sqlmap.client.SqlMapExecutor;
 public class DatabaseIniterService extends SqlMapClientDaoSupport 
 {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	/**
+	 * 期望的数据库版本
+	 */
+	private Integer expectedDatabaseVersion=0;
+	/**
+	 * 数据库更新文件
+	 */
+	private Resource sqlFile; 
 	/**
 	 * 初始化数据库的方法
 	 */
@@ -36,10 +63,10 @@ public class DatabaseIniterService extends SqlMapClientDaoSupport
 	{
 		boolean re=false;
 		
-		Map queryForObject=null;
+		DBUpdateDTO queryForObject=null;
 		try
 		{
-			queryForObject = (Map)this.getSqlMapClientTemplate().queryForObject("getDBInitedData");
+			queryForObject = (DBUpdateDTO)this.getSqlMapClientTemplate().queryForObject("getDBInitedData");
 		}
 		catch (Exception e)
 		{
@@ -49,12 +76,12 @@ public class DatabaseIniterService extends SqlMapClientDaoSupport
 		logger.debug("查询出的数据={}",JSONObject.fromObject(queryForObject));
 		if(queryForObject!=null)
 		{
-			Object object = queryForObject.get("INITED_FLAG");
-			logger.debug("初始化标志={}",object);
-			if("1".equals(object.toString()))
-			{
-				re=true;
-			}
+			Integer curVerion = queryForObject.getCurrentVersion();
+			logger.debug("初始化标志={}",curVerion);
+			
+			if(curVerion<expectedDatabaseVersion)
+				re=false;
+			
 		}
 		
 		return re;
@@ -62,9 +89,121 @@ public class DatabaseIniterService extends SqlMapClientDaoSupport
 	}
 	private void initDB()
 	{
-		this.getSqlMapClientTemplate().update("createTableSysInit");
-		this.getSqlMapClientTemplate().insert("insertSysInit");
+		DataSource dataSource = this.getDataSource();
+		JdbcTemplate jdbcTemplat=new JdbcTemplate(dataSource);
 		
+		String sql=readDBSql();
+		if(StringUtils.hasText(sql))
+		{
+			String[] splitSql = splitSql(sql);
+			if(!ArrayUtils.isEmpty(splitSql) )
+			{
+				jdbcTemplat.batchUpdate(splitSql);
+				
+				try
+				{
+					Map<String,Object> param=new HashMap<String,Object>();
+					param.put("newCurrentVersion", expectedDatabaseVersion);
+					int updateRows = this.getSqlMapClientTemplate().update("updateSysInit",param);
+					if(updateRows<1)
+					{
+						this.getSqlMapClientTemplate().insert("insertSysInit", param);
+					}
+					else if(updateRows>1)
+					{
+						logger.error("数据库中记录数据库版本的数据有{}条数据，期望只有一条，接下来会只保留版本最高的一条",updateRows);
+						int deleteRows = this.getSqlMapClientTemplate().delete("deleteSysInit");
+						logger.error("数据库中记录数据库版本的数据有{}条数据，删除了其中的{}条",updateRows,deleteRows);
+					}
+					
+				}
+				catch (Exception e)
+				{
+					logger.error("执行数据库更新的SQL出错了",e);
+				}
+				finally
+				{
+					
+					
+				}
+			}
+			
+			
+			
+			
+		}
+		
+	}
+	private String[] splitSql(String sql)
+	{
+		String[] re=null;
+		List<String> sqlList=new ArrayList<String>(); 
+		String splitor=";";
+		String[] splitted = sql.split(splitor, -1);
+		if(splitted!=null && splitted.length>0)
+		{
+			Pattern pattern = Pattern.compile("'");
+			for(int i=0;i<splitted.length;i++)
+			{
+				String one=splitted[i];
+				Matcher  matcher = pattern.matcher(one);
+				int count = 0;
+		        while (matcher.find())
+		            count++;
+				if(count % 2!=0)
+				{
+					if(i<splitted.length-1)
+					{
+						splitted[i]="";
+						String next=splitted[i+1];
+						splitted[i+1]=one+splitor+next;
+					}
+				}
+			}
+			
+			for(int i=0;i<splitted.length;i++)
+			{
+				String one=splitted[i];
+				
+				if(StringUtils.hasText(one))
+					sqlList.add(one);
+			}
+		}
+		
+		re=sqlList.toArray(new String[0]);
+		
+		return re;
+	}
+	private String readDBSql()
+	{
+		String re="";
+		try
+		{
+			InputStream inputStream = sqlFile.getInputStream();
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+			re=FileCopyUtils.copyToString(bufferedReader);
+		}
+		catch (IOException e)
+		{
+			logger.error("读出数据库初始化文件出错",e);
+		}
+		return re;
+	}
+	public Integer getExpectedDatabaseVersion()
+	{
+		return expectedDatabaseVersion;
+	}
+	public void setExpectedDatabaseVersion(Integer expectedDatabaseVersion)
+	{
+		this.expectedDatabaseVersion = expectedDatabaseVersion;
+	}
+	public Resource getSqlFile()
+	{
+		return sqlFile;
+	}
+	public void setSqlFile(Resource sqlFile)
+	{
+		this.sqlFile = sqlFile;
 	}
 	
 }

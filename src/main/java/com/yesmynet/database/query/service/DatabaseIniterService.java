@@ -81,7 +81,8 @@ public class DatabaseIniterService extends SqlMapClientDaoSupport
 			
 			if(curVerion<expectedDatabaseVersion)
 				re=false;
-			
+			else
+				re=true;
 		}
 		
 		return re;

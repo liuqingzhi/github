@@ -1,4 +1,7 @@
 package com.yesmynet.database.query.core.dto;
+
+import org.springframework.util.StringUtils;
+
 /**
  * 表示一个查询参数。
  * 查询有两个阶段:1、定义阶段，2、运行阶段。当定义查询时，可以定义查询所使用的参数，例如：定义一个查询有
@@ -14,6 +17,10 @@ public class Parameter extends BaseDto
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	/**
+	 * 对应的查询
+	 */
+	private QueryDefinition queryDefinition;
 	/**
 	 * 标题
 	 */
@@ -44,6 +51,29 @@ public class Parameter extends BaseDto
 	 * 参数运行时的值
 	 */
 	private String value;
+	/**
+	 * 得到参数的html页面上显示的名称
+	 * @param parameterDefine
+	 * @return
+	 */
+	public String getParameterName() 
+	{
+		String re=getCustomName();
+		if(!StringUtils.hasText(re))
+		{
+			re=getDefaltNamePrifix();
+			re+=getId();
+		}
+		return re;
+	}
+	public QueryDefinition getQueryDefinition()
+	{
+		return queryDefinition;
+	}
+	public void setQueryDefinition(QueryDefinition queryDefinition)
+	{
+		this.queryDefinition = queryDefinition;
+	}
 	public String getTitle()
 	{
 		return title;

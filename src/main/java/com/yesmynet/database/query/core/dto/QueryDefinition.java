@@ -33,6 +33,10 @@ public class QueryDefinition  extends BaseDto
 	 * 是否显示“执行查询”的按钮
 	 */
 	private Boolean showExecuteButton;
+	/**
+	 * 定义查询的java代码
+	 */
+	private String javaCode;
 	public String getName()
 	{
 		return name;
@@ -73,4 +77,12 @@ public class QueryDefinition  extends BaseDto
     {
         this.showExecuteButton = showExecuteButton;
     }
+	public String getJavaCode()
+	{
+		return javaCode;
+	}
+	public void setJavaCode(String javaCode)
+	{
+		this.javaCode = javaCode;
+	}
 }

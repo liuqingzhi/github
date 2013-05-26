@@ -1,6 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
 <sqlMap>
-    
+	
+	<!--得到查询定义-->
+	<resultMap id="queryResult" class="com.yesmynet.database.query.core.dto.QueryDefinition">
+        <result property="id"  column="id"/>
+        <result property="name"  column="name"/>
+        <result property="description"  column="description"/>
+        <result property="afterParameterHtml"  column="after_Parameter_Html"/>
+        <result property="showExecuteButton"  column="show_Execute_Button"/>
+        <result property="javaCode"  column="java_code"/>
+        <result property="parameters" column="id" select="getQueryParameters" />
+    </resultMap>
+	<!--得到查询定义的参数-->
+	<resultMap id="queryParameterResult" class="com.yesmynet.database.query.core.dto.Parameter">
+        <result property="queryDefinition.id"  column="query_id"/>
+        <result property="id"  column="id"/>
+        <result property="title"  column="title"/>
+        <result property="description"  column="description"/>
+        <result property="htmlType"  column="html_Type"/>
+        <result property="customName"  column="custom_Name"/>
+    </resultMap>
+
+	<!--得到查询定义的参数-->
+    <select id="getQueryDefinitionById" resultMap="queryResult" parameterClass="java.lang.Integer">
+       	select * From m_sys_query 
+		where id=#value#
+    </select>
+	
+    <!--得到查询定义的参数-->
+    <select id="getQueryParameters" resultMap="queryParameterResult" parameterClass="java.lang.Integer">
+       	select t1.* From m_sys_query_parameter t1
+		where t1.query_id=#value#
+    </select>
     
 </sqlMap>

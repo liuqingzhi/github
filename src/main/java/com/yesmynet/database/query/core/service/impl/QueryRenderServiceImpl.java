@@ -18,17 +18,39 @@ public class QueryRenderServiceImpl implements QueryRenderService
 	 * 不同类型的参数类型与对应的html代码的映射
 	 * key是参数类型，value是该类型参数要显示的html代码
 	 */
-	private Map<ParameterHtmlType,String> parameterHtmlTemplate;
+	protected Map<ParameterHtmlType,String> parameterHtmlTemplate;
 	public String getQueryHtml(QueryDefinition query)
 	{
-		String re="";
+		StringBuilder re=new StringBuilder();
 		List<Parameter> parameters = query.getParameters();
 		if(!CollectionUtils.isEmpty(parameters))
 		{
 			for(Parameter define:parameters)
 			{
 				String value=define.getValue();
+				String paraName=getParaName(define);
+				ParameterHtmlType htmlType = define.getHtmlType();
+				String template=parameterHtmlTemplate.get(htmlType);
+				
+				String html=MessageFormat.format(template, paraName,value);
+				re.append(html);
+				
 			}
+		}
+		return re.toString();
+	}
+	/**
+	 * 得到参数在http请求时要使用的名字,在java中可以通过这个名字从request中得到参数的值
+	 * 如：request.getParameter("名字")
+	 * @param parameter
+	 * @return
+	 */
+	protected String getParaName(Parameter parameter)
+	{
+		String re=parameter.getCustomName();
+		if(!StringUtils.hasText(re))
+		{
+			re=parameter.getDefaltNamePrifix()+""+parameter.getId();
 		}
 		return re;
 	}
@@ -42,26 +64,19 @@ public class QueryRenderServiceImpl implements QueryRenderService
 		String re="";
 		ParameterHtmlType parameterHtmlType = parameter.getHtmlType();
 		String tempalte=parameterHtmlTemplate.get(parameterHtmlType);
-		String parameterName=getParameterName(parameter);
+		String parameterName=parameter.getParameterName();
 		String value=parameter.getValue();
 		
 		re=MessageFormat.format(tempalte, parameterName,value);
 		
 		return re;
 	}
-	/**
-	 * 得到参数的html页面上显示的名称
-	 * @param parameterDefine
-	 * @return
-	 */
-	protected String getParameterName(Parameter parameterDefine) 
+	public Map<ParameterHtmlType, String> getParameterHtmlTemplate()
 	{
-		String re=parameterDefine.getCustomName();
-		if(!StringUtils.hasText(re))
-		{
-			re=parameterDefine.getDefaltNamePrifix();
-			re+=parameterDefine.getId();
-		}
-		return re;
+		return parameterHtmlTemplate;
+	}
+	public void setParameterHtmlTemplate(Map<ParameterHtmlType, String> parameterHtmlTemplate)
+	{
+		this.parameterHtmlTemplate = parameterHtmlTemplate;
 	}
 }

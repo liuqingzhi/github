@@ -35,6 +35,31 @@ public class QueryController
 	@Resource(name = "queryRenderService")
 	private QueryRenderService queryRenderService;
 	
+	private enum SystemParameterName
+	{
+		/**
+		 * 表示要查看或要执行的查询的Id
+		 */
+		QueryId("SystemQueryId"),
+		/**
+		 * 表示要执行查询的命令，当本参数有值，不管值是什么都表示要执行查询
+		 */
+		QueryExecute("SystemQueryExecute")
+		;
+		/**
+		 * http参数名称
+		 */
+		private String paramerName;
+		private SystemParameterName(String httpParamerName)
+		{
+			this.paramerName=httpParamerName;
+		}
+		public String getParamerName()
+		{
+			return paramerName;
+		}
+		
+	}
 	/**
 	 * 显示查询的界面
 	 * @param queryId
@@ -61,7 +86,7 @@ public class QueryController
 	 */
 	private String getQueryShowHtml(HttpServletRequest request)
 	{
-		String queryId=request.getParameter("SystemQueryId");
+		String queryId=request.getParameter(SystemParameterName.QueryId.getParamerName());
 		
 		
 		QueryDefinition queryParameters = queryDefinitionService.getQueryParameters(queryId);

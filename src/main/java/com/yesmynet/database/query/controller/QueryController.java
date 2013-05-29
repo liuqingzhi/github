@@ -46,7 +46,13 @@ public class QueryController
 		/**
 		 * 表示要执行查询的命令，当本参数有值，不管值是什么都表示要执行查询
 		 */
-		QueryExecute("SystemQueryExecute")
+		QueryExecute("SystemQueryExecute"),
+		/**
+         * 表示要使用哪个数据源
+         * 在执行查询时，可以从多个数据源中选择一个。
+         */
+        DataSourceId("SystemDataSourceId")
+        
 		;
 		/**
 		 * http参数名称
@@ -71,8 +77,14 @@ public class QueryController
 	@RequestMapping(value = "/query.do")/*@RequestMapping(value="/query/{ownerId}/view.do", method=RequestMethod.GET)*/
 	public String showQuery(HttpServletRequest request,Model model)
     {
-		List<DataSourceConfig> allDataSources = dataSourceService.getDataSources();
-		String queryHtml=getQueryShowHtml(request);
+	    String queryId=request.getParameter(SystemParameterName.QueryId.getParamerName());//要使用的查询的ID
+	    String queryExecute=request.getParameter(SystemParameterName.QueryExecute.getParamerName());//是否要执行查询
+        String dataSourceId=request.getParameter(SystemParameterName.DataSourceId.getParamerName());//使用的数据源
+	    boolean executeQuery=queryExecute==null?false:true;//是否要执行查询
+	    
+	    
+	    List<DataSourceConfig> allDataSources = dataSourceService.getDataSources();
+		String queryHtml=getQueryShowHtml(queryId,request);
 		
 		//判断是否要查询；String command=request.getParameter("SystemQueryCommand");
 		
@@ -103,11 +115,8 @@ public class QueryController
 	 * @param request
 	 * @return
 	 */
-	private String getQueryShowHtml(HttpServletRequest request)
+	private String getQueryShowHtml(String queryId,HttpServletRequest request)
 	{
-		String queryId=request.getParameter(SystemParameterName.QueryId.getParamerName());
-		
-		
 		QueryDefinition queryParameters = queryDefinitionService.getQueryParameters(queryId);
 		setHttpParameterValue(queryParameters,request);
 		String queryHtml = queryRenderService.getQueryHtml(queryParameters);

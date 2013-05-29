@@ -1,10 +1,12 @@
 package com.yesmynet.database.query.controller;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -79,6 +81,23 @@ public class QueryController
 		
         return "showQuery";
     }
+	/*
+	@RequestMapping(value = "/yourURLHere")
+    public void handleFileDownload(HttpServletResponse response) {
+        File file = myFileService.getFile();
+ 
+        response.setContentType("application/xls"); //in my example this was an xls file
+        response.setContentLength(new Long(file.length()).intValue());
+        response.setHeader("Content-Disposition","attachment; filename=MyFile.csv");
+ 
+        try {
+            FileCopyUtils.copy(new FileInputStream(file), response.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return;
+    }
+    */
 	/**
 	 * 显示一个查询
 	 * @param request

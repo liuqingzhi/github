@@ -51,4 +51,8 @@
 		
 	</bean>
 
+	<bean id="queryRenderService" class="com.yesmynet.database.query.core.service.impl.QueryRenderServiceImpl" >
+	</bean>	
+	
+
 </beans>

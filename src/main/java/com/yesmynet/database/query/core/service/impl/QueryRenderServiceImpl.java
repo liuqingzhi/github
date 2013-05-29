@@ -1,6 +1,7 @@
 package com.yesmynet.database.query.core.service.impl;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,25 +19,35 @@ public class QueryRenderServiceImpl implements QueryRenderService
 	 * 不同类型的参数类型与对应的html代码的映射
 	 * key是参数类型，value是该类型参数要显示的html代码
 	 */
-	protected Map<ParameterHtmlType,String> parameterHtmlTemplate;
+    protected Map<ParameterHtmlType, String> parameterHtmlTemplate = new HashMap<ParameterHtmlType, String>()
+    {
+        {
+            put(ParameterHtmlType.inputText, "<input type=''text'' name=''{0}'' value=''{1}'' >");
+            put(ParameterHtmlType.textArea, "<textarea rows=''6'' cols=''20'' name=''{0}''>{1}</textarea>");
+        }
+    };
 	public String getQueryHtml(QueryDefinition query)
 	{
 		StringBuilder re=new StringBuilder();
-		List<Parameter> parameters = query.getParameters();
-		if(!CollectionUtils.isEmpty(parameters))
+		if(query!=null)
 		{
-			for(Parameter define:parameters)
-			{
-				String value=define.getValue();
-				String paraName=getParaName(define);
-				ParameterHtmlType htmlType = define.getHtmlType();
-				String template=parameterHtmlTemplate.get(htmlType);
-				
-				String html=MessageFormat.format(template, paraName,value);
-				re.append(html);
-				
-			}
+		    List<Parameter> parameters = query.getParameters();
+	        if(!CollectionUtils.isEmpty(parameters))
+	        {
+	            for(Parameter define:parameters)
+	            {
+	                String oneParameterHtml=getParameterHtml(define);
+	                
+	                re.append(oneParameterHtml);
+	                
+	            }
+	        }
+	        re.append(query.getAfterParameterHtml());
+	        
+	        if(query.getShowExecuteButton())
+	            re.append("<input type='submit' value='执行查询' name='executeButton'>");
 		}
+		
 		return re.toString();
 	}
 	/**
@@ -61,13 +72,14 @@ public class QueryRenderServiceImpl implements QueryRenderService
 	 */
 	protected String getParameterHtml(Parameter parameter)
 	{
-		String re="";
+		String re=parameter.getTitle()+"：";
 		ParameterHtmlType parameterHtmlType = parameter.getHtmlType();
 		String tempalte=parameterHtmlTemplate.get(parameterHtmlType);
 		String parameterName=parameter.getParameterName();
 		String value=parameter.getValue();
+		if(!StringUtils.hasText(value)) value="";
 		
-		re=MessageFormat.format(tempalte, parameterName,value);
+		re+=MessageFormat.format(tempalte, parameterName,value);
 		
 		return re;
 	}

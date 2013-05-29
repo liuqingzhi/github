@@ -101,16 +101,20 @@ public class QueryController
 	 */
 	private void setHttpParameterValue(QueryDefinition queryParameters,HttpServletRequest request)
 	{
-		List<Parameter> parameters = queryParameters.getParameters();
-		if(!CollectionUtils.isEmpty(parameters))
-		{
-			for(Parameter p:parameters)
-			{
-				String parameterName = p.getParameterName();
-				String parameterValue = request.getParameter(parameterName);
-				p.setValue(parameterValue);
-			}
-		}
+	    if(queryParameters!=null)
+	    {
+	        List<Parameter> parameters = queryParameters.getParameters();
+	        if(!CollectionUtils.isEmpty(parameters))
+	        {
+	            for(Parameter p:parameters)
+	            {
+	                String parameterName = p.getParameterName();
+	                String parameterValue = request.getParameter(parameterName);
+	                p.setValue(parameterValue);
+	            }
+	        }    
+	    }
+		
 	}
 	public DataSourceService getDataSourceService()
 	{

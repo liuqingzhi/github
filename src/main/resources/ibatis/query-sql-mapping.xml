@@ -22,7 +22,7 @@
         <result property="customName"  column="custom_Name"/>
     </resultMap>
 
-	<!--得到查询定义的参数-->
+	<!--得到查询-->
     <select id="getQueryDefinitionById" resultMap="queryResult" parameterClass="java.lang.Integer">
        	select * From m_sys_query 
 		where id=#value#
@@ -34,4 +34,9 @@
 		where t1.query_id=#value#
     </select>
     
+    <!--得到默认查询-->
+    <select id="getQueryDefinitionDefault" resultMap="queryResult" parameterClass="java.lang.Integer">
+       	select * From m_sys_query 
+		where system_default=1
+    </select>
 </sqlMap>

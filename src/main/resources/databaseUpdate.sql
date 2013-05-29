@@ -24,6 +24,7 @@ CREATE TABLE m_sys_query_parameter
 	description VARCHAR(1000),/*描述*/
 	html_Type VARCHAR(200),/*显示参数的html输入框的方式，如：单选文本框、多行文本框*/
 	custom_Name  VARCHAR(200),/*自定义的查询参数名称,就是在http请求时的parameter名字*/
+	show SMALLINT DEFAULT 1,/*是否显示,1显示，0不显示*/
 	last_update_time TIMESTAMP/*上次更新时间*/
 	)
 	;

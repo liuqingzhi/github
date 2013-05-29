@@ -17,4 +17,20 @@ public class QueryReult extends BaseDto
 	 * 要直接显示的查询结果
 	 */
 	private String content;
+    public OutputStream getOutputStream()
+    {
+        return outputStream;
+    }
+    public void setOutputStream(OutputStream outputStream)
+    {
+        this.outputStream = outputStream;
+    }
+    public String getContent()
+    {
+        return content;
+    }
+    public void setContent(String content)
+    {
+        this.content = content;
+    }
 }

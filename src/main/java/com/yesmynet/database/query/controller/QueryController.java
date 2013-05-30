@@ -112,26 +112,35 @@ public class QueryController
 	    
 	    QueryDefinition queryParameters = queryDefinitionService.getQueryParameters(queryId);
         setHttpParameterValue(queryParameters,request);
-        String queryHtml = queryRenderService.getQueryHtml(queryParameters);
+        String queryHtml = queryRenderService.getQueryHtml(queryParameters,allDataSources,dataSourceId);
         QueryReult queryResult=null;
 		
-		if(executeQuery)
-		{
-		    /*要执行查询*/
-		    Query queryInstance = queryDefinitionService.getQueryInstance(queryId);
-		    DataSourceConfig dataSourceById = dataSourceService.getDataSourceById(dataSourceId);
-		    queryResult = queryExecutorService.executeQuery(queryInstance, queryParameters,dataSourceById);
-		}
-		
-		if(queryResult!=null && queryResult.getContentInputStream()!=null)
+        Exception queryExecuteException=null;
+		try
         {
-            FileCopyUtils.copy(queryResult.getContentInputStream(), response.getOutputStream());
-            return null;
+            if(executeQuery)
+            {
+                /*要执行查询*/
+                Query queryInstance = queryDefinitionService.getQueryInstance(queryId);
+                DataSourceConfig dataSourceById = dataSourceService.getDataSourceById(dataSourceId);
+                queryResult = queryExecutorService.executeQuery(queryInstance, queryParameters,dataSourceById);
+            }
+            
+            if(queryResult!=null && queryResult.getContentInputStream()!=null)
+            {
+                FileCopyUtils.copy(queryResult.getContentInputStream(), response.getOutputStream());
+                return null;
+            }
+        } catch (Exception e)
+        {
+            queryExecuteException=e;
+            e.printStackTrace();
         }
 		
 		model.addAttribute("dataSources", allDataSources);
 		model.addAttribute("queryHtml", queryHtml);
 		model.addAttribute("queryResult", queryResult);
+		model.addAttribute("queryExecuteException", queryExecuteException);
 		
         return "showQuery";
     }

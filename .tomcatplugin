@@ -21,6 +21,7 @@
         <webClassPathEntry>D:/java/jdk/jdk1.6.0_24/jre/lib/rt.jar</webClassPathEntry>
         <webClassPathEntry>D:/project/yesmynet/databaseQuery/github/target/classes</webClassPathEntry>
         <webClassPathEntry>E:/maven_repository/aopalliance/aopalliance/1.0/aopalliance-1.0.jar</webClassPathEntry>
+        <webClassPathEntry>E:/maven_repository/com/google/code/gson/gson/2.2.4/gson-2.2.4.jar</webClassPathEntry>
         <webClassPathEntry>E:/maven_repository/com/oracle/ojdbc14/10.2.0.3.0/ojdbc14-10.2.0.3.0.jar</webClassPathEntry>
         <webClassPathEntry>E:/maven_repository/commons-beanutils/commons-beanutils/1.8.0/commons-beanutils-1.8.0.jar</webClassPathEntry>
         <webClassPathEntry>E:/maven_repository/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar</webClassPathEntry>

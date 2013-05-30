@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.yesmynet.database.query.core.dto.Parameter;
 import com.yesmynet.database.query.core.dto.QueryDefinition;
+import com.yesmynet.database.query.dto.DataSourceConfig;
 
 /**
  * 显示一个查询。在执行查询前，要先把查询显示出来，让用户输入查询相关的参数。
@@ -18,7 +19,9 @@ public interface QueryRenderService
 	 * 每个查询在显示时可能有些特殊要求，通过定义每个查询我html，可以对每个查询的界面做一些调整，如：显示一些额外的提示信息，显示一些链接等。
 	 * @param query 查询的定义
 	 * @param parameterRuntimeList 查询运行时的参数值
+	 * @param allDataSources 所有的数据源配置
+	 * @param selectedDataSourceId 选中的数据源的ID
 	 * @return
 	 */
-	public String getQueryHtml(QueryDefinition query);
+	public String getQueryHtml(QueryDefinition query,List<DataSourceConfig> allDataSources,String selectedDataSourceId);
 }

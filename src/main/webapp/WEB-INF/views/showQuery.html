@@ -8,17 +8,14 @@
 
 	<body>
 		<div class="divBlock">
-			${queryHtml}
-			
-
-		<#if dataSources?exists>
-		<#list dataSources as dataSource>
-	        
-	        	显示名称：${dataSource.name},
-			id：     ${dataSource.id},
-		</#list>
-		</#if>
-		
+			<form action="" method="POST">
+				<input type="hidden" name="SystemQueryExecute" value="">
+				${queryHtml}
+			</form>
+		</div>
+		<div class="divBlock">
+			${(queryResult.content)!""}
+			${(queryExecuteException)!""}
 		</div>
 	</body>
 </html>

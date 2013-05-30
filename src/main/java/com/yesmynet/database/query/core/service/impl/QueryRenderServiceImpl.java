@@ -12,6 +12,7 @@ import com.yesmynet.database.query.core.dto.Parameter;
 import com.yesmynet.database.query.core.dto.ParameterHtmlType;
 import com.yesmynet.database.query.core.dto.QueryDefinition;
 import com.yesmynet.database.query.core.service.QueryRenderService;
+import com.yesmynet.database.query.dto.DataSourceConfig;
 
 public class QueryRenderServiceImpl implements QueryRenderService
 {
@@ -23,10 +24,10 @@ public class QueryRenderServiceImpl implements QueryRenderService
     {
         {
             put(ParameterHtmlType.inputText, "<input type=''text'' name=''{0}'' value=''{1}'' >");
-            put(ParameterHtmlType.textArea, "<textarea rows=''6'' cols=''20'' name=''{0}''>{1}</textarea>");
+            put(ParameterHtmlType.textArea, "<textarea rows=''6'' cols=''70'' name=''{0}''>{1}</textarea>");
         }
     };
-	public String getQueryHtml(QueryDefinition query)
+	public String getQueryHtml(QueryDefinition query,List<DataSourceConfig> allDataSources,String selectedDataSourceId)
 	{
 		StringBuilder re=new StringBuilder();
 		if(query!=null)
@@ -44,11 +45,41 @@ public class QueryRenderServiceImpl implements QueryRenderService
 	        }
 	        re.append(query.getAfterParameterHtml());
 	        
+	        re.append("<br>");
+	        re.append(showDataSourceSelect(allDataSources,selectedDataSourceId));
+	        re.append("<br>");
 	        if(query.getShowExecuteButton())
 	            re.append("<input type='submit' value='执行查询' name='executeButton'>");
 		}
 		
 		return re.toString();
+	}
+	/**
+	 * 输出显示数据源的选择框
+	 * @param allDataSources
+	 * @param selectedDataSourceId
+	 * @return
+	 * @author 刘庆志
+	 */
+	private String showDataSourceSelect(List<DataSourceConfig> allDataSources,String selectedDataSourceId)
+	{
+	    StringBuilder re=new StringBuilder();
+	    
+	    re.append("<select name=\"SystemDataSourceId\">\n");
+	    
+	    if(!CollectionUtils.isEmpty(allDataSources))
+	    {
+	        for(DataSourceConfig d:allDataSources)
+	        {
+	            re.append("<option value='").append(d.getId()).append("'");
+	            
+	            if(d.getId().equals(selectedDataSourceId)) re.append(" selected "); 
+	            
+	            re.append(" >").append(d.getName()).append("</option>");
+	        }
+	    }
+        re.append("</select>");
+        return re.toString();
 	}
 	/**
 	 * 得到参数在http请求时要使用的名字,在java中可以通过这个名字从request中得到参数的值

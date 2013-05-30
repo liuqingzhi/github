@@ -1,5 +1,6 @@
 package com.yesmynet.database.query.core.dto;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
@@ -12,18 +13,18 @@ public class QueryReult extends BaseDto
 	/**
 	 * 要使用流输出的查询结果
 	 */
-	private OutputStream outputStream;
+	private InputStream contentInputStream;
 	/**
 	 * 要直接显示的查询结果
 	 */
 	private String content;
-    public OutputStream getOutputStream()
+    public InputStream getContentInputStream()
     {
-        return outputStream;
+        return contentInputStream;
     }
-    public void setOutputStream(OutputStream outputStream)
+    public void setContentInputStream(InputStream contentInputStream)
     {
-        this.outputStream = outputStream;
+        this.contentInputStream = contentInputStream;
     }
     public String getContent()
     {

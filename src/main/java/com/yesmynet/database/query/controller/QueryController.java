@@ -1,6 +1,7 @@
 package com.yesmynet.database.query.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -11,14 +12,18 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.yesmynet.database.query.core.dto.Parameter;
+import com.yesmynet.database.query.core.dto.Query;
 import com.yesmynet.database.query.core.dto.QueryDefinition;
+import com.yesmynet.database.query.core.dto.QueryReult;
 import com.yesmynet.database.query.core.service.DataSourceService;
 import com.yesmynet.database.query.core.service.QueryDefinitionService;
+import com.yesmynet.database.query.core.service.QueryExecutorService;
 import com.yesmynet.database.query.core.service.QueryRenderService;
 import com.yesmynet.database.query.dto.DataSourceConfig;
 
@@ -30,13 +35,32 @@ import com.yesmynet.database.query.dto.DataSourceConfig;
 @Controller
 public class QueryController
 {
+    /**
+     * 数据源配置的service
+     */
 	@Resource(name = "dataSourceService")
 	private DataSourceService dataSourceService;
+	/**
+	 * 得到一个查询的定义的service
+	 */
 	@Resource(name = "queryDefinitionService")
 	private QueryDefinitionService queryDefinitionService;
+	/**
+	 * 显示一个查询的service
+	 */
 	@Resource(name = "queryRenderService")
 	private QueryRenderService queryRenderService;
-	
+	/**
+	 * 执行一个查询的Service
+	 */
+	@Resource(name = "queryExecutorService")
+	private QueryExecutorService queryExecutorService;
+	/**
+	 * 系统使用的request参数名，在查询定义时，应该不要让查询的参数名与
+	 * 这里使用的参数名有一样的。
+	 * @author 刘庆志
+	 *
+	 */
 	private enum SystemParameterName
 	{
 		/**
@@ -73,56 +97,44 @@ public class QueryController
 	 * @param queryId
 	 * @param model
 	 * @return
+	 * @throws IOException 
 	 */
 	@RequestMapping(value = "/query.do")/*@RequestMapping(value="/query/{ownerId}/view.do", method=RequestMethod.GET)*/
-	public String showQuery(HttpServletRequest request,Model model)
+	public String showQuery(HttpServletRequest request,HttpServletResponse response,Model model) throws IOException
     {
 	    String queryId=request.getParameter(SystemParameterName.QueryId.getParamerName());//要使用的查询的ID
 	    String queryExecute=request.getParameter(SystemParameterName.QueryExecute.getParamerName());//是否要执行查询
         String dataSourceId=request.getParameter(SystemParameterName.DataSourceId.getParamerName());//使用的数据源
-	    boolean executeQuery=queryExecute==null?false:true;//是否要执行查询
-	    
+
+	    boolean executeQuery=(queryExecute==null)?false:true;//是否要执行查询
 	    
 	    List<DataSourceConfig> allDataSources = dataSourceService.getDataSources();
-		String queryHtml=getQueryShowHtml(queryId,request);
+	    
+	    QueryDefinition queryParameters = queryDefinitionService.getQueryParameters(queryId);
+        setHttpParameterValue(queryParameters,request);
+        String queryHtml = queryRenderService.getQueryHtml(queryParameters);
+        QueryReult queryResult=null;
 		
-		//判断是否要查询；String command=request.getParameter("SystemQueryCommand");
+		if(executeQuery)
+		{
+		    /*要执行查询*/
+		    Query queryInstance = queryDefinitionService.getQueryInstance(queryId);
+		    DataSourceConfig dataSourceById = dataSourceService.getDataSourceById(dataSourceId);
+		    queryResult = queryExecutorService.executeQuery(queryInstance, queryParameters,dataSourceById);
+		}
+		
+		if(queryResult!=null && queryResult.getContentInputStream()!=null)
+        {
+            FileCopyUtils.copy(queryResult.getContentInputStream(), response.getOutputStream());
+            return null;
+        }
 		
 		model.addAttribute("dataSources", allDataSources);
 		model.addAttribute("queryHtml", queryHtml);
+		model.addAttribute("queryResult", queryResult);
 		
         return "showQuery";
     }
-	/*
-	@RequestMapping(value = "/yourURLHere")
-    public void handleFileDownload(HttpServletResponse response) {
-        File file = myFileService.getFile();
- 
-        response.setContentType("application/xls"); //in my example this was an xls file
-        response.setContentLength(new Long(file.length()).intValue());
-        response.setHeader("Content-Disposition","attachment; filename=MyFile.csv");
- 
-        try {
-            FileCopyUtils.copy(new FileInputStream(file), response.getOutputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return;
-    }
-    */
-	/**
-	 * 显示一个查询
-	 * @param request
-	 * @return
-	 */
-	private String getQueryShowHtml(String queryId,HttpServletRequest request)
-	{
-		QueryDefinition queryParameters = queryDefinitionService.getQueryParameters(queryId);
-		setHttpParameterValue(queryParameters,request);
-		String queryHtml = queryRenderService.getQueryHtml(queryParameters);
-		
-		return queryHtml;
-	}
 	/**
 	 * 把httpRequest中请求的参数值设置到查询的参数中
 	 * @param queryParameters
@@ -168,5 +180,13 @@ public class QueryController
 	{
 		this.queryRenderService = queryRenderService;
 	}
+    public QueryExecutorService getQueryExecutorService()
+    {
+        return queryExecutorService;
+    }
+    public void setQueryExecutorService(QueryExecutorService queryExecutorService)
+    {
+        this.queryExecutorService = queryExecutorService;
+    }
 	
 }

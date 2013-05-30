@@ -65,6 +65,7 @@ public class QueryRenderServiceImpl implements QueryRenderService
 	{
 	    StringBuilder re=new StringBuilder();
 	    
+	    re.append("选择数据库：");
 	    re.append("<select name=\"SystemDataSourceId\">\n");
 	    
 	    if(!CollectionUtils.isEmpty(allDataSources))

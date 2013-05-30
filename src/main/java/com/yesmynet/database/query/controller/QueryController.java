@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
@@ -136,14 +137,25 @@ public class QueryController
             queryExecuteException=e;
             e.printStackTrace();
         }
+		String queryExecuteExceptionString = printException(queryExecuteException);
+		
 		
 		model.addAttribute("dataSources", allDataSources);
 		model.addAttribute("queryHtml", queryHtml);
 		model.addAttribute("queryResult", queryResult);
 		model.addAttribute("queryExecuteException", queryExecuteException);
+		model.addAttribute("queryExecuteExceptionString", queryExecuteExceptionString);
 		
         return "showQuery";
     }
+	private String printException(Exception e)
+	{
+	    String re="";
+	    if(e!=null)
+	        re=ExceptionUtils.getStackTrace(e);
+	    
+	    return re;
+	}
 	/**
 	 * 把httpRequest中请求的参数值设置到查询的参数中
 	 * @param queryParameters

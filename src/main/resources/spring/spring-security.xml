@@ -45,10 +45,10 @@
 
    <bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
       <property name="userDetailsService"><ref local="jdbcDaoImpl"/></property>
-      <property name="userCache"><ref local="userCache"/></property>
+      <!--  <property name="userCache"><ref local="userCache"/></property>-->
       <property name="passwordEncoder"><ref local="passwordEncoder"/></property>
    </bean>
-
+<!-- 
    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
     
    <bean id="userCacheBackend" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
@@ -63,7 +63,10 @@
    <bean id="userCache" class="org.acegisecurity.providers.dao.cache.EhCacheBasedUserCache">
       <property name="cache"><ref local="userCacheBackend"/></property>
    </bean>
-
+ -->
+  <!-- An access decision voter that reads ROLE_* configuration settings -->
+   <bean id="roleVoter" class="org.acegisecurity.vote.RoleVoter"/>
+ 
    <bean id="loggerListener" class="org.acegisecurity.event.authentication.LoggerListener"/>
 
    <bean id="anonymousProcessingFilter" class="org.acegisecurity.providers.anonymous.AnonymousProcessingFilter">

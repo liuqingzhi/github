@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.yesmynet.database.query.core.dto.Parameter;
+import com.yesmynet.database.query.core.dto.ParameterHtmlType;
 import com.yesmynet.database.query.core.dto.Query;
 import com.yesmynet.database.query.core.dto.QueryDefinition;
 import com.yesmynet.database.query.core.dto.QueryReult;
@@ -169,6 +170,7 @@ public class QueryController
 	        queryParameters = queryDefinitionService.getQueryParameters(queryId);
 	    }
 	    
+	    model.addAttribute("allHtmlTypes", ParameterHtmlType.values());
 	    model.addAttribute("query", queryParameters);
 	    return "editQuery";
 	}

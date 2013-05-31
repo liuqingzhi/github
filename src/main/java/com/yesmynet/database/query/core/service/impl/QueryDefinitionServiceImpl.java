@@ -124,6 +124,7 @@ public class QueryDefinitionServiceImpl extends SqlMapClientDaoSupport implement
         {
             for(Parameter p:parameters)
             {
+                p.setQueryDefinition(queryDefinition);
                 sqlId=StringUtils.hasText(p.getId())?"updateQueryParameter":"insertQueryParameter";
                 this.getSqlMapClientTemplate().update(sqlId, p);
             }

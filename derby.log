@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
-Thu May 30 18:30:54 CST 2013:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.9.1.0 - (1344872): instance a816c00e-013e-f4fd-80e5-000000b94b88 
+Fri May 31 18:06:53 CST 2013:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.9.1.0 - (1344872): instance a816c00e-013e-fa0d-de96-000000d9ac38 
 on database directory D:\test\dbQueryConfig  with class loader sun.misc.Launcher$AppClassLoader@19821f 
 Loaded from file:/E:/maven_repository/org/apache/derby/derby/10.9.1.0/derby-10.9.1.0.jar
 java.vendor=Sun Microsystems Inc.

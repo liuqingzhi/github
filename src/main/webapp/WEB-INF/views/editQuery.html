@@ -4,6 +4,9 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>查询数据库</title>
 		<link rel="stylesheet" href="/css/style.css" type="text/css" media="screen" title="Stylesheet"/>
+		<script type="text/javascript"></script>
+		<script type="text/javascript" src="/js/jquery-1.10.1.js"></script>
+		
 	</head>
 
 	<body>
@@ -14,15 +17,47 @@
 				名称：<input type="text" name="name" value="${(query.name)!""}"><br>
 				描述:<textarea rows="3" cols="100" name="description">${(query.description)!""}</textarea><br>
 				定义参数：<br>
-				<#if (query.parameters)?exists>
-    			<#list query.parameters as param>
-    				参数名称：<input type="text" name="parameters[${param_index}].customName" value="${(param.customName)!""}"><br>
-    				参数标题：<input type="text" name="parameters[${param_index}].title" value="${(param.title)!""}"><br>
-    				参数描述: <textarea rows="3" cols="100" name="parameters[${param_index}].description">${(param.description)!""}</textarea><br>
-					参数html类型：<input type="text" name="parameters[${param_index}].htmlType" value="${(param.htmlType)!""}"><br>
-    				
-    			</#list>
-        		</#if>
+				<table id="parameterListTable">
+					<tr>
+						<th>ID</th>
+						<th>参数名称</th>
+						<th>参数标题</th>
+						<th>参数描述</th>
+						<th>参数html类型</th>
+					</tr>
+					<#if (query.parameters)?exists>
+	    			<#list query.parameters as param>
+	    			<tr>
+	    				<td>
+	    					<input type="checkbox" name="parameters[${param_index}].id" value="${param.id}">
+	    				</td>
+	    				<td>
+	    					<input type="text" name="parameters[${param_index}].customName" value="${(param.customName)!""}">
+	    				</td>
+						<td>
+							<input type="text" name="parameters[${param_index}].title" value="${(param.title)!""}">
+						</td>	    				
+	    				<td>
+	    					<textarea rows="3" cols="100" name="parameters[${param_index}].description">${(param.description)!""}</textarea>
+	    				</td>
+	    				<td>
+	    					<select name="parameters[${param_index}].htmlType">
+						        <#list allHtmlTypes as htmlType1>
+						        <option value="${htmlType1}" <#if (param.htmlType)?exists && param.htmlType==htmlType1>selected</#if>>${htmlType1.title}</option>
+						        </#list>
+						    </select>
+	    				</td>
+	    			</tr>	
+	    			</#list>
+	        		</#if>
+	        		<tr>
+	        			<td colspan='5'>
+	        				<input type="button" value="增加一行" id="parameterAddButton">
+	        				<input type="button" value="删除选中的行" id="parameterDeleteButton">
+	        			</td>
+	        		</tr>		
+				</table>
+				
 				
 				java代码:<br><textarea rows="60" cols="100" name="javaCode">${(query.javaCode)!""}</textarea><br>
 				
@@ -36,5 +71,48 @@
 				
 		</div>
 	</body>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#parameterAddButton").click(function()
+			{
+				var rowCount = $('#parameterListTable tr').length;
+				rowCount=rowCount-2;
+				
+				
+				$('#parameterListTable tr:last').after('<tr>'+
+					'	<td>'+
+					'		<input type="checkbox" name="parameters['+ rowCount +'].id" value="">'+
+					'	</td>'+
+	    			'	<td>'+
+    				'	<input type="text" name="parameters['+ rowCount +'].customName" value="">'+
+    				'</td>'+
+					'<td>'+
+					'	<input type="text" name="parameters['+ rowCount +'].title" value="">'+
+					'</td>'+
+    				'<td>'+
+    				'	<textarea rows="3" cols="100" name="parameters['+ rowCount +'].description"></textarea>'+
+    				'</td>'+
+    				'<td>'+
+    				'	<select name="parameters['+ rowCount +'].htmlType">'+
+					'	        <#list allHtmlTypes as htmlType1>'+
+					'	        <option value="${htmlType1}">${htmlType1.title}</option>'+
+					'	        </#list>'+
+					'	    </select>'+
+    				'</td>'+
+    			'</tr>');
+			});
+			
+			$("#parameterDeleteButton").click(function()
+			{
+				$('#parameterListTable input[type=checkbox]:checked')
+				.each(function () {
+				       var sThisVal = (this.checked ? $(this).val() : "");
+				  });
+			});
+			
+		});
+
+	</script>
 </html>
 

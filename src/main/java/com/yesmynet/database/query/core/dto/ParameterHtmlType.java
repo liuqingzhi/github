@@ -12,15 +12,32 @@ public  enum ParameterHtmlType
 	/**
 	 * 单行文本框
 	 */
-	inputText,
+	inputText("单行文本"),
 	/**
 	 * 多行文本框
 	 */
-	textArea,
+	textArea("多行文本"),
 	/**
      * html中的hidden输入控件 
      */
-    inputHidden
+    inputHidden("Hidden输入控件")
     ;
+	/**
+	 * 显示在界面上的类型名称
+	 */
+    private String title;
+    private ParameterHtmlType(String title)
+    {
+        this.title=title;
+    }
+    /**
+     * 得到显示的名称
+     * @return
+     * @author 刘庆志
+     */
+    public String getTitle()
+    {
+        return title;
+    }
     
 }

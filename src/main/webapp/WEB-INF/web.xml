@@ -32,7 +32,9 @@
 
     <filter-mapping>
       <filter-name>Acegi Filter Chain Proxy</filter-name>
-      <url-pattern>/*</url-pattern>
+      <!-- <url-pattern>/*</url-pattern> -->
+      <url-pattern>*.dodo</url-pattern>
+      
     </filter-mapping>
 
   <servlet>

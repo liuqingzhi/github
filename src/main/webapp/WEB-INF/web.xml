@@ -20,7 +20,24 @@
   </welcome-file-list>
 
 
-
+	<!-- spring mvc编码，不使用这个，会在request时的中文乱码，因为使用@RequestParam注解的话，在拦截器中设置请求编码已经晚了，要在spring初始化之前设置，用spring自带的org.springframework.web.filter.CharacterEncodingFilter即可 -->
+	<filter>
+		<filter-name>encoding</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	    <init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>encoding</filter-name>
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+	
    <filter>
         <filter-name>Acegi Filter Chain Proxy</filter-name>
         <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>

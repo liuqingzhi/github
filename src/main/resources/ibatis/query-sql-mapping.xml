@@ -23,20 +23,66 @@
     </resultMap>
 
 	<!--得到查询-->
-    <select id="getQueryDefinitionById" resultMap="queryResult" parameterClass="java.lang.Integer">
+    <select id="getQueryDefinitionById" resultMap="queryResult" parameterClass="java.lang.String">
        	select * From m_sys_query 
 		where id=#value#
     </select>
 	
     <!--得到查询定义的参数-->
-    <select id="getQueryParameters" resultMap="queryParameterResult" parameterClass="java.lang.Integer">
+    <select id="getQueryParameters" resultMap="queryParameterResult" parameterClass="java.lang.String">
        	select t1.* From m_sys_query_parameter t1
 		where t1.query_id=#value#
     </select>
     
     <!--得到默认查询-->
-    <select id="getQueryDefinitionDefault" resultMap="queryResult" parameterClass="java.lang.Integer">
+    <select id="getQueryDefinitionDefault" resultMap="queryResult" parameterClass="java.lang.String">
        	select * From m_sys_query 
 		where system_default=1
     </select>
+    
+    <!--更新查询-->
+    <update id="updateQueryDefinition" parameterClass="com.yesmynet.database.query.core.dto.QueryDefinition" >
+		UPDATE m_sys_query set 
+		name=#name#,description=#description#,after_Parameter_Html=#afterParameterHtml:VARCHAR#,show_Execute_Button=#showExecuteButton#,finished=#finished#,
+		java_code=#javaCode#,last_update_time=CURRENT_TIMESTAMP
+		where id=#id#
+	</update>
+    <!--插入查询-->
+    <insert id="insertQueryDefinition" parameterClass="com.yesmynet.database.query.core.dto.QueryDefinition" >
+		insert into m_sys_query (name,description,after_Parameter_Html,show_Execute_Button,system_init_create,system_default,finished,java_code,last_update_time)
+		values
+		(#name#,#description#,#afterParameterHtml:VARCHAR#,#showExecuteButton#,0,0,#finished#,#javaCode#,CURRENT_TIMESTAMP)
+		
+		<selectKey type="post" keyProperty="id" resultClass="java.lang.String" >
+    		values IDENTITY_VAL_LOCAL()
+  		</selectKey>
+		  
+	</insert>
+	
+	<!--删除查询中定义的参数-->
+	<delete id="deleteQueryParameter" parameterClass="java.util.Map">
+		delete from m_sys_query_parameter where query_id=#queryId:INTEGER# 
+		<isNotEmpty property="toDeleteParameterIds">
+			and id in
+			<iterate property="toDeleteParameterIds" open="(" close=")" conjunction=",">  
+			     #toDeleteParameterIds[]:INTEGER#  
+			</iterate>
+		</isNotEmpty>
+	</delete>
+	
+    <!--更新查询定义的参数-->
+    <update id="updateQueryParameter" parameterClass="com.yesmynet.database.query.core.dto.Parameter" >
+		UPDATE m_sys_query_parameter set 
+		title=#title#,description=#description#,html_Type=#htmlType#,custom_Name=#customName#
+		where id=#id#
+	</update>
+    <!--插入查询定义的参数-->
+    <update id="insertQueryParameter" parameterClass="com.yesmynet.database.query.core.dto.Parameter" >
+		insert into m_sys_query_parameter (query_id,title,description,html_Type,custom_Name)
+		values
+		(#queryDefinition.id#,#title#,#description#,#htmlType#,#customName#) 
+	</update>
+	
+	
+	
 </sqlMap>

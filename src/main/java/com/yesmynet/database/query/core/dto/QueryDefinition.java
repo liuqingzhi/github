@@ -32,11 +32,15 @@ public class QueryDefinition  extends BaseDto
 	/**
 	 * 是否显示“执行查询”的按钮
 	 */
-	private Boolean showExecuteButton;
+	private Boolean showExecuteButton=true;
 	/**
 	 * 定义查询的java代码
 	 */
 	private String javaCode;
+	/**
+	 * 编辑查询是否完成
+	 */
+	private Boolean finished=false;
 	public String getName()
 	{
 		return name;
@@ -85,4 +89,12 @@ public class QueryDefinition  extends BaseDto
 	{
 		this.javaCode = javaCode;
 	}
+    public Boolean getFinished()
+    {
+        return finished;
+    }
+    public void setFinished(Boolean finished)
+    {
+        this.finished = finished;
+    }
 }

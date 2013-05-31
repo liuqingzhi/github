@@ -1,11 +1,18 @@
 package com.yesmynet.database.query.core.service.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import groovy.lang.GroovyClassLoader;
 
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import com.yesmynet.database.query.core.dto.Parameter;
 import com.yesmynet.database.query.core.dto.Query;
 import com.yesmynet.database.query.core.dto.QueryDefinition;
 import com.yesmynet.database.query.core.service.QueryDefinitionService;
@@ -76,5 +83,52 @@ public class QueryDefinitionServiceImpl extends SqlMapClientDaoSupport implement
 	        re="aaa";
 	    return re;
 	}
+    public void save(QueryDefinition queryDefinition)
+    {
+        String queryId=queryDefinition.getId();
+        String sqlId="";
+        
+        sqlId=StringUtils.hasText(queryId)?"updateQueryDefinition":"insertQueryDefinition";
+        if(StringUtils.hasText(queryId))
+        {
+            sqlId="updateQueryDefinition";
+            this.getSqlMapClientTemplate().update(sqlId, queryDefinition);
+        }
+        else
+        {
+            //使用insert是为了得到新插入的数据的ID，使用update我试过了，得不到ID
+            sqlId="insertQueryDefinition";
+            this.getSqlMapClientTemplate().insert(sqlId, queryDefinition);
+            
+            queryId=queryDefinition.getId();//得到新插入数据的Id
+        }
+        
+        List<Parameter> parameters = queryDefinition.getParameters();
+        List<String> toDeleteParamIds=new ArrayList<String>();
+        Map<String,Object> paramMap=new HashMap<String,Object>();
+        
+        paramMap.put("toDeleteParameterIds", toDeleteParamIds);
+        paramMap.put("queryId", queryId);
+        
+        
+        if(!CollectionUtils.isEmpty(parameters))
+        {
+            for(Parameter p:parameters)
+            {
+                toDeleteParamIds.add(p.getId());
+            }
+        }
+        this.getSqlMapClientTemplate().update("deleteQueryParameter", paramMap);
+        
+        if(!CollectionUtils.isEmpty(parameters))
+        {
+            for(Parameter p:parameters)
+            {
+                sqlId=StringUtils.hasText(p.getId())?"updateQueryParameter":"insertQueryParameter";
+                this.getSqlMapClientTemplate().update(sqlId, p);
+            }
+        }
+        
+    }
 
 }

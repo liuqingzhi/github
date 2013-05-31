@@ -197,7 +197,7 @@ public class QueryTest extends TestCase
         jdbcTemplate.update(sql,javacode);
         
         sql="insert into sc.m_sys_query_parameter (query_id,title,description,html_Type,custom_Name)\n"+
-        "values(7,'SQL','要执行的SQL','textArea','sqlCode')\n";
+        "values(8,'SQL','要执行的SQL','textArea','sqlCode')\n";
         
         jdbcTemplate.update(sql);
     }

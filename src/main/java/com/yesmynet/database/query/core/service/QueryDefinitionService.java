@@ -18,9 +18,16 @@ public interface QueryDefinitionService
 	 */
 	public QueryDefinition getQueryParameters(String queryId);
 	/**
+	 * 保存查询。
+	 * @param queryDefinition 要保存的数据
+	 * @author 刘庆志
+	 */
+	public void save(QueryDefinition queryDefinition);
+	/**
 	 * 根据ID得到表示查询的实例
 	 * @param id
 	 * @return
 	 */
 	public Query getQueryInstance(String id);
+	
 }

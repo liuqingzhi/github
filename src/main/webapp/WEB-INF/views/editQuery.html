@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>查询数据库</title>
+		<link rel="stylesheet" href="/css/style.css" type="text/css" media="screen" title="Stylesheet"/>
+	</head>
+
+	<body>
+		<div class="divBlock">
+			<form action="saveQuery.do" method="POST">
+				<input type="hidden" name="SystemQueryExecute" value="">
+				<input type="hidden" name="id" value="${(query.id)!""}">
+				名称：<input type="text" name="name" value="${(query.name)!""}"><br>
+				描述:<textarea rows="3" cols="100" name="description">${(query.description)!""}</textarea><br>
+				定义参数：<br>
+				<#if (query.parameters)?exists>
+    			<#list query.parameters as param>
+    				参数名称：<input type="text" name="parameters[${param_index}].customName" value="${(param.customName)!""}"><br>
+    				参数标题：<input type="text" name="parameters[${param_index}].title" value="${(param.title)!""}"><br>
+    				参数描述: <textarea rows="3" cols="100" name="parameters[${param_index}].description">${(param.description)!""}</textarea><br>
+					参数html类型：<input type="text" name="parameters[${param_index}].htmlType" value="${(param.htmlType)!""}"><br>
+    				
+    			</#list>
+        		</#if>
+				
+				java代码:<br><textarea rows="60" cols="100" name="javaCode">${(query.javaCode)!""}</textarea><br>
+				
+				<input type="submit" value="保存" name="saveQuery">
+			</form>
+		</div>
+		<div class="divBlock">
+			
+			${(queryResult.content)!""}
+			<pre>${queryExecuteExceptionString!""}</pre>	
+				
+		</div>
+	</body>
+</html>
+

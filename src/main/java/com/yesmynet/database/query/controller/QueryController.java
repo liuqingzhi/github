@@ -14,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -147,6 +149,50 @@ public class QueryController
 		model.addAttribute("queryExecuteExceptionString", queryExecuteExceptionString);
 		
         return "showQuery";
+    }
+	/**
+	 * 编辑一个查询
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 * @author 刘庆志
+	 */
+	@RequestMapping(value = "/editQuery.do")
+	public String editQuery(HttpServletRequest request,HttpServletResponse response,QueryDefinition queryDefinition,Model model)
+	{
+	    String queryId=queryDefinition.getId();
+	    QueryDefinition queryParameters=null;
+	    
+	    if(StringUtils.hasText(queryId))
+	    {
+	        queryParameters = queryDefinitionService.getQueryParameters(queryId);
+	    }
+	    
+	    model.addAttribute("query", queryParameters);
+	    return "editQuery";
+	}
+	/**
+	 * 保存查询
+	 * @param request
+	 * @param response
+	 * @param queryDefinition
+	 * @param model
+	 * @return
+	 * @author 刘庆志
+	 */
+	@RequestMapping(value = "/saveQuery.do")
+    public String saveQuery(HttpServletRequest request,HttpServletResponse response,QueryDefinition queryDefinition,Model model)
+    {
+        String queryId="";
+        QueryDefinition queryParameters=null;
+        
+        queryDefinitionService.save(queryDefinition);
+        
+        queryId=queryDefinition.getId();
+        
+        model.addAttribute("query", queryParameters);
+        return "redirect:/editQuery.do?id="+queryId;
     }
 	private String printException(Exception e)
 	{

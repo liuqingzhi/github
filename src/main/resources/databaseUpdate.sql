@@ -28,3 +28,23 @@ CREATE TABLE m_sys_query_parameter
 	last_update_time TIMESTAMP/*上次更新时间*/
 	)
 	;
+CREATE TABLE m_sys_role
+	(ID INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT m_sys_user_PK PRIMARY KEY,
+	role_Code VARCHAR(200),/*角色的代码*/
+	role_Title VARCHAR(200)/*角色的显示名称*/
+	)
+	;
+CREATE TABLE m_sys_user
+	(ID INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT m_sys_user_PK PRIMARY KEY,
+	login_Name VARCHAR(200),/*角色的代码*/
+	password VARCHAR(200)/*角色的显示名称*/
+	nick VARCHAR(200),/*昵称*/
+	createDate TIMESTAMP/*创建时间*/
+	)
+	;
+CREATE TABLE m_sys_user_role
+	(ID INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT m_sys_user_role_PK PRIMARY KEY,
+	user_id int,/*用户ID*/
+	role_id int/*角色Id*/
+	)
+	;	

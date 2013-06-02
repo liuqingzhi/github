@@ -39,10 +39,20 @@
 
    <bean id="jdbcDaoImpl" class="org.acegisecurity.userdetails.jdbc.JdbcDaoImpl">
       <property name="dataSource"><ref bean="dataSource"/></property>
+      <property name="usersByUsernameQuery">
+      	select login_Name,password,1 from m_sys_user where login_Name=?
+      </property>
+      <property name="authoritiesByUsernameQuery">
+		select t3.login_name,t2.role_Code 
+		from m_sys_user_role t1 join m_sys_role t2 on t1.role_id=t2.id 
+		join m_sys_user t3 on t1.user_id=t3.id
+		where t3.login_Name=?
+      </property>
+      
    </bean>
 
-   <bean id="passwordEncoder" class="org.acegisecurity.providers.encoding.Md5PasswordEncoder"/>
-
+   <bean id="passwordEncoder" class="org.acegisecurity.providers.encoding.PlaintextPasswordEncoder"/><!-- org.acegisecurity.providers.encoding.Md5PasswordEncoder -->
+ 
    <bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
       <property name="userDetailsService"><ref local="jdbcDaoImpl"/></property>
       <!--  <property name="userCache"><ref local="userCache"/></property>-->

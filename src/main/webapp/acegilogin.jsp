@@ -1,16 +1,17 @@
-<%@page pageEncoding="GBK" contentType="text/html; charset=GBK" %>
-<%@ taglib prefix='c' uri='http://java.sun.com/jstl/core' %>
+<%@ page language="java" pageEncoding="utf-8"%>
+<%@ taglib uri="http://java.sun.com/jstl/core_rt" prefix="c"%>
+
 <%@ page import="org.acegisecurity.ui.AbstractProcessingFilter" %>
 <%@ page import="org.acegisecurity.ui.webapp.AuthenticationProcessingFilter" %>
 <%@ page import="org.acegisecurity.AuthenticationException" %>
 
 <html>
   <head>
-    <title>µÇÂ¼</title>
+    <title>ç™»å½•</title>
   </head>
 
   <body>
-    <h1>µÇÂ¼</h1>
+    <h1>ç™»å½•</h1>
 
 	<P>Valid users:
 	<P>
@@ -41,7 +42,7 @@
       <table>
         <tr>
         	<td>User:</td>
-        	<td><input type='text' name='j_username' <%//<c:if test="${not empty param.login_error}">value='<%= session.getAttribute(AuthenticationProcessingFilter.ACEGI_SECURITY_LAST_USERNAME_KEY) %>'</c:if> %>/></td>
+        	<td><input type='text' name='j_username' <c:if test="${not empty param.login_error}">value='<%= session.getAttribute(AuthenticationProcessingFilter.ACEGI_SECURITY_LAST_USERNAME_KEY) %>'</c:if>/></td>
         </tr>
         <tr><td>Password:</td><td><input type='password' name='j_password'/></td></tr>
         <tr><td><input type="checkbox" name="_acegi_security_remember_me"/></td><td>Don't ask for my password for two weeks</td></tr>

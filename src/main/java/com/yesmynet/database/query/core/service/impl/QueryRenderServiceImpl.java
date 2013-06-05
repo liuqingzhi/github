@@ -16,17 +16,6 @@ import com.yesmynet.database.query.dto.DataSourceConfig;
 
 public class QueryRenderServiceImpl implements QueryRenderService
 {
-	/**
-	 * 不同类型的参数类型与对应的html代码的映射
-	 * key是参数类型，value是该类型参数要显示的html代码
-	 */
-    protected Map<ParameterHtmlType, String> parameterHtmlTemplate = new HashMap<ParameterHtmlType, String>()
-    {
-        {
-            put(ParameterHtmlType.inputText, "<input type=''text'' name=''{0}'' value=''{1}'' >");
-            put(ParameterHtmlType.textArea, "<textarea rows=''6'' cols=''70'' name=''{0}''>{1}</textarea>");
-        }
-    };
 	public String getQueryHtml(QueryDefinition query,List<DataSourceConfig> allDataSources,String selectedDataSourceId)
 	{
 		StringBuilder re=new StringBuilder();
@@ -106,7 +95,7 @@ public class QueryRenderServiceImpl implements QueryRenderService
 	{
 		String re=parameter.getTitle()+"：";
 		ParameterHtmlType parameterHtmlType = parameter.getHtmlType();
-		String tempalte=parameterHtmlTemplate.get(parameterHtmlType);
+		String tempalte=parameterHtmlType.getHtmlTemplate();
 		String parameterName=parameter.getParameterName();
 		String value=parameter.getValue();
 		if(!StringUtils.hasText(value)) value="";
@@ -114,13 +103,5 @@ public class QueryRenderServiceImpl implements QueryRenderService
 		re+=MessageFormat.format(tempalte, parameterName,value);
 		
 		return re;
-	}
-	public Map<ParameterHtmlType, String> getParameterHtmlTemplate()
-	{
-		return parameterHtmlTemplate;
-	}
-	public void setParameterHtmlTemplate(Map<ParameterHtmlType, String> parameterHtmlTemplate)
-	{
-		this.parameterHtmlTemplate = parameterHtmlTemplate;
 	}
 }

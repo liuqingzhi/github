@@ -12,23 +12,28 @@ public  enum ParameterHtmlType
 	/**
 	 * 单行文本框
 	 */
-	inputText("单行文本"),
+	inputText("单行文本","<input type=''text'' name=''{0}'' value=''{1}'' >"),
 	/**
 	 * 多行文本框
 	 */
-	textArea("多行文本"),
+	textArea("多行文本","<textarea rows=''6'' cols=''70'' name=''{0}''>{1}</textarea>"),
 	/**
      * html中的hidden输入控件 
      */
-    inputHidden("Hidden输入控件")
+    inputHidden("Hidden输入控件","<input type=''hidden'' name=''{0}'' value=''{1}'' >")
     ;
 	/**
 	 * 显示在界面上的类型名称
 	 */
     private String title;
-    private ParameterHtmlType(String title)
+    /**
+     * 显示本类型的参数时的html模板
+     */
+    private String htmlTemplate;
+    private ParameterHtmlType(String title,String htmlTemplate)
     {
         this.title=title;
+        this.htmlTemplate=htmlTemplate;
     }
     /**
      * 得到显示的名称
@@ -39,5 +44,13 @@ public  enum ParameterHtmlType
     {
         return title;
     }
+    /**
+     * 得到显示本类型的参数时的html模板
+     *
+     * @return
+     */
+	public String getHtmlTemplate() {
+		return htmlTemplate;
+	}
     
 }

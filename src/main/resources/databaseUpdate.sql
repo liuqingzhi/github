@@ -37,7 +37,7 @@ CREATE TABLE m_sys_role
 CREATE TABLE m_sys_user
 	(ID INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT m_sys_user_PK PRIMARY KEY,
 	login_Name VARCHAR(200),/*角色的代码*/
-	password VARCHAR(200)/*角色的显示名称*/
+	password VARCHAR(200),/*角色的显示名称*/
 	nick VARCHAR(200),/*昵称*/
 	createDate TIMESTAMP/*创建时间*/
 	)

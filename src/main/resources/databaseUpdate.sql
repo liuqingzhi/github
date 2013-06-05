@@ -29,7 +29,7 @@ CREATE TABLE m_sys_query_parameter
 	)
 	;
 CREATE TABLE m_sys_role
-	(ID INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT m_sys_user_PK PRIMARY KEY,
+	(ID INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT m_sys_role_PK PRIMARY KEY,
 	role_Code VARCHAR(200),/*角色的代码*/
 	role_Title VARCHAR(200)/*角色的显示名称*/
 	)
@@ -48,3 +48,6 @@ CREATE TABLE m_sys_user_role
 	role_id int/*角色Id*/
 	)
 	;	
+insert into  m_sys_user (LOGIN_NAME,PASSWORD,NICK,CREATEDATE) values ('admin','123456','系统管理员',CURRENT_TIMESTAMP);
+insert into  m_sys_role (ROLE_CODE,ROLE_TITLE) values ('role_admin','系统管理员角色');
+insert into  m_sys_user_role (USER_ID,ROLE_ID) values (1,1);	

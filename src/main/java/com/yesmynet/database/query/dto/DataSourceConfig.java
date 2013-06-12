@@ -17,6 +17,10 @@ public class DataSourceConfig
 	 */
 	private String name;
 	/**
+	 * 数据库言
+	 */
+	private DatabaseDialect databaseDialect;
+	/**
 	 * 配置的数据源
 	 */
 	private DataSource datasource;
@@ -35,6 +39,14 @@ public class DataSourceConfig
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+	public DatabaseDialect getDatabaseDialect()
+	{
+		return databaseDialect;
+	}
+	public void setDatabaseDialect(DatabaseDialect databaseDialect)
+	{
+		this.databaseDialect = databaseDialect;
 	}
 	public DataSource getDatasource()
 	{

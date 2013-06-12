@@ -17,10 +17,7 @@ public class QueryExecutorServiceImpl implements QueryExecutorService
             QueryDefinition queryDefinition, DataSourceConfig datasource)
     {
         QueryReult re=null;
-        DataSource datasource2 = datasource.getDatasource();
-        JdbcTemplate jdbcTemplate=new JdbcTemplate(datasource2);
-                           
-        re=query.doInQuery(jdbcTemplate, queryDefinition);
+        re=query.doInQuery(datasource, queryDefinition);
         return re;
     }
 

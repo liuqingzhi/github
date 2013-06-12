@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.yesmynet.database.query.dto.DataSourceConfig;
+
 /**
  * 表示一个查询在运行时要执行的数据库操作。
  * 查询有两个阶段:1、定义阶段，2、运行阶段。当定义查询时，可以定义查询所使用的参数，例如：定义一个查询有
@@ -17,9 +19,9 @@ public interface Query
 {
 	/**
 	 * 要在数据库中执行的操作。
-	 * @param jdbcTemplate 利用本参数操作数据库
+	 * @param dataSourceConfig 使用的数据库连接
 	 * @param queryDefinition 查询定义的所有参数 
 	 * @return
 	 */
-	public QueryReult doInQuery(JdbcTemplate jdbcTemplate,QueryDefinition queryDefinition);
+	public QueryReult doInQuery(DataSourceConfig dataSourceConfig,QueryDefinition queryDefinition);
 }

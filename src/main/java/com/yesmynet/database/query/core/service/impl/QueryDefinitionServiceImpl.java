@@ -16,6 +16,7 @@ import com.yesmynet.database.query.core.dto.Parameter;
 import com.yesmynet.database.query.core.dto.Query;
 import com.yesmynet.database.query.core.dto.QueryDefinition;
 import com.yesmynet.database.query.core.service.QueryDefinitionService;
+import com.yesmynet.database.query.service.QueryDefaultImpl;
 
 public class QueryDefinitionServiceImpl extends SqlMapClientDaoSupport implements QueryDefinitionService
 {

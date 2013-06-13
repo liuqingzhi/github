@@ -20,7 +20,10 @@ import com.yesmynet.database.query.service.QueryDefaultImpl;
 
 public class QueryDefinitionServiceImpl extends SqlMapClientDaoSupport implements QueryDefinitionService
 {
-
+	/**
+	 * 默认查询的实例类，当没有指定query的ID时会使用本默认查询
+	 */
+	private QueryDefaultImpl defaultQueryInstance;
 	public QueryDefinition getQueryParameters(String queryId)
 	{
 		QueryDefinition re=null;
@@ -32,8 +35,7 @@ public class QueryDefinitionServiceImpl extends SqlMapClientDaoSupport implement
 		else
 		{
 		    //re=getDefaultQuery();
-		    re=QueryDefaultImpl.getQueryDefinition();
-		    
+			re=defaultQueryInstance.getQueryDefinition();
 		}
 		
 		return re;
@@ -77,8 +79,7 @@ public class QueryDefinitionServiceImpl extends SqlMapClientDaoSupport implement
 	    }
 	    else
 	    {
-	        QueryDefaultImpl query=new QueryDefaultImpl();
-	        return query; 
+	        return defaultQueryInstance; 
 	    }
 		
 	}
@@ -144,5 +145,11 @@ public class QueryDefinitionServiceImpl extends SqlMapClientDaoSupport implement
         }
         
     }
+	public QueryDefaultImpl getDefaultQueryInstance() {
+		return defaultQueryInstance;
+	}
+	public void setDefaultQueryInstance(QueryDefaultImpl defaultQueryInstance) {
+		this.defaultQueryInstance = defaultQueryInstance;
+	}
 
 }

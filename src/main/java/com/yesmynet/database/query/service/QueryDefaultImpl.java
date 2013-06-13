@@ -738,5 +738,12 @@ public class QueryDefaultImpl  implements Query
     {
         QueryDefaultImpl.queryDefinition = queryDefinition;
     }
+	public List<DatabseDialectService> getDatabaseDialectServices() {
+		return databaseDialectServices;
+	}
+	public void setDatabaseDialectServices(
+			List<DatabseDialectService> databaseDialectServices) {
+		this.databaseDialectServices = databaseDialectServices;
+	}
     
 }

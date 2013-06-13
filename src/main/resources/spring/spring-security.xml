@@ -34,9 +34,10 @@
         <x509 />
 -->
         <!-- Uncomment to limit the number of sessions a user can have -->
-        <session-management invalid-session-url="/timeout.jsp">
+         <!--<session-management invalid-session-url="/timeout.jsp">
             <concurrency-control max-sessions="1" error-if-maximum-exceeded="true" />
         </session-management>
+        -->
 
     </http>
 

@@ -12,9 +12,20 @@
 	
 	<bean id="queryDefinitionService" class="com.yesmynet.database.query.core.service.impl.QueryDefinitionServiceImpl" >
 		<property name="sqlMapClientTemplate" ref="sqlMapClientTemplate"></property>
+		<property name="defaultQueryInstance" ref="queryDefaultImpl"></property>
+	</bean>
+	
+	<bean id="queryDefaultImpl" class="com.yesmynet.database.query.service.QueryDefaultImpl" >
+		<property name="databaseDialectServices">
+			<list>
+				<bean class="com.yesmynet.database.query.service.DatabseDialectService$1">
+				</bean>
+			</list>	
+		</property>
 		
 	</bean>
-
+	
+	
 	<bean id="dataSourceService" class="com.yesmynet.database.query.core.service.impl.DataSourceServiceImpl" >
 		<property name="dataSourceConfigList">
 			<list>

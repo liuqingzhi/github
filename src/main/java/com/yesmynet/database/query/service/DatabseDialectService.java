@@ -21,7 +21,7 @@ public interface DatabseDialectService
 					"SELECT a.*,ROWNUM num FROM ("
 					;
 			re+=sql;
-			re+=") a where ROWNUM  <=  "+ resultEnd +" ) b WHERE num  >  "+resultBegin;	
+			re+=") a where ROWNUM  <=  "+ resultEnd +" ) b WHERE num  >=  "+resultBegin;	
 			return re;
 		}
 

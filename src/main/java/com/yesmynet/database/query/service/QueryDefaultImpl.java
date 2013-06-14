@@ -44,7 +44,7 @@ public class QueryDefaultImpl  implements Query
     /**
      * 关于本查询的设置，包括所有的参数
      */
-    private static QueryDefinition queryDefinition;
+    private QueryDefinition queryDefinition;
     /**
      * 所有可用的数据库言
      */
@@ -74,31 +74,7 @@ public class QueryDefaultImpl  implements Query
      */
     private static String PARAM_CURRENT_PAGE="currentPage";
     
-    static {
-        /**
-         * 初始化本查询的配置,包括所有参数
-         */
-        queryDefinition=new QueryDefinition();
-        List<Parameter> parameters=new ArrayList<Parameter>(); 
-        
-        queryDefinition.setParameters(parameters);
-        
-        
-        queryDefinition.setId("-1");
-        queryDefinition.setName("默认查询");
-        queryDefinition.setDescription("系统实现的默认查询");
-        queryDefinition.setAfterParameterHtml("显示完所有参数后要显示的html,现在还没有");
-        queryDefinition.setShowExecuteButton(true);
-        
-        Parameter p1=new Parameter();
-        p1.setTitle("SQL脚本");
-        p1.setDescription("在这里输入SQL");
-        p1.setHtmlType(ParameterHtmlType.textArea);
-        p1.setCustomName(PARAM_SQL);
-        
-        parameters.add(p1);
-        
-    }
+    
     public QueryReult doInQuery(DataSourceConfig dataSourceConfig,
             QueryDefinition queryDefinition)
     {
@@ -841,13 +817,49 @@ public class QueryDefaultImpl  implements Query
 		}
 		
 	}
-    public static QueryDefinition getQueryDefinition()
-    {
+	/**
+	 * 初始化本查询的所有参数
+	 * @return
+	 */
+	private QueryDefinition initQueryDefinition()
+	{
+        /**
+         * 初始化本查询的配置,包括所有参数
+         */
+		QueryDefinition queryDefinition=new QueryDefinition();
+        List<Parameter> parameters=new ArrayList<Parameter>(); 
+        
+        queryDefinition.setParameters(parameters);
+        
+        
+        queryDefinition.setId("-1");
+        queryDefinition.setName("默认查询");
+        queryDefinition.setDescription("系统实现的默认查询");
+        queryDefinition.setAfterParameterHtml("显示完所有参数后要显示的html,现在还没有");
+        queryDefinition.setShowExecuteButton(true);
+        
+        Parameter p1=new Parameter();
+        p1.setTitle("SQL脚本");
+        p1.setDescription("在这里输入SQL");
+        p1.setHtmlType(ParameterHtmlType.textArea);
+        p1.setCustomName(PARAM_SQL);
+        
+        parameters.add(p1);
+        
         return queryDefinition;
-    }
-    public static void setQueryDefinition(QueryDefinition queryDefinition)
+	    
+	}
+    public QueryDefinition getQueryDefinition()
     {
-        QueryDefaultImpl.queryDefinition = queryDefinition;
+    	if(this.queryDefinition==null)
+    	{
+    		this.queryDefinition=initQueryDefinition();
+    	}
+        return this.queryDefinition;
+    }
+    public void setQueryDefinition(QueryDefinition queryDefinition)
+    {
+        this.queryDefinition = queryDefinition;
     }
 	public List<DatabseDialectService> getDatabaseDialectServices() {
 		return databaseDialectServices;

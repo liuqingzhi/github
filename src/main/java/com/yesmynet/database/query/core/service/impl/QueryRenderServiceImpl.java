@@ -93,12 +93,17 @@ public class QueryRenderServiceImpl implements QueryRenderService
 	 */
 	protected String getParameterHtml(Parameter parameter)
 	{
-		String re=parameter.getTitle()+"：";
+		String re="";
 		ParameterHtmlType parameterHtmlType = parameter.getHtmlType();
 		String tempalte=parameterHtmlType.getHtmlTemplate();
 		String parameterName=parameter.getParameterName();
 		String style = parameter.getStyle();
 		String value=parameter.getValue();
+		
+		if(!ParameterHtmlType.inputHidden.equals(parameterHtmlType))
+		{
+			re=parameter.getTitle()+"：";	
+		}
 		if(!StringUtils.hasText(value)) value="";
 		
 		re+=MessageFormat.format(tempalte, value,parameterName,style);

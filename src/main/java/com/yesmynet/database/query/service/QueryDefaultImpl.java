@@ -64,15 +64,19 @@ public class QueryDefaultImpl  implements Query
     /**
      * 在request参数名称，用来得到要执行的sql
      */
-    private static String PARAM_SQL="sqlCode";
+    private final String PARAM_SQL="sqlCode";
     /**
      * 在request参数名称，用来得到分页时每页的记录数
      */
-    private static String PARAM_PAGE_SIZE="pageSize";
+    private final String PARAM_PAGE_SIZE="pageSize";
     /**
      * 在request参数名称，用来得到当前页码
      */
-    private static String PARAM_CURRENT_PAGE="currentPage";
+    private final String PARAM_CURRENT_PAGE="currentPage";
+    /**
+     * 是否为ajax请求只要有值就是ajax请求
+     */
+    private final String PARAM_REQUEST_BY_AJAX="ajaxRequest";
     
     
     public QueryReult doInQuery(DataSourceConfig dataSourceConfig,
@@ -844,7 +848,33 @@ public class QueryDefaultImpl  implements Query
         p1.setHtmlType(ParameterHtmlType.textArea);
         p1.setCustomName(PARAM_SQL);
         p1.setStyle("width: 1000px; height: 200px;");
+        
+        Parameter p2=new Parameter();
+        p2.setTitle("每页显示的记录数");
+        p2.setDescription("");
+        p2.setHtmlType(ParameterHtmlType.inputHidden);
+        p2.setCustomName(PARAM_PAGE_SIZE);
+        p2.setStyle("");
+        
+        Parameter p3=new Parameter();
+        p3.setTitle("当前页码");
+        p3.setDescription("");
+        p3.setHtmlType(ParameterHtmlType.inputHidden);
+        p3.setCustomName(PARAM_CURRENT_PAGE);
+        p3.setStyle("");
+        
+        Parameter p4=new Parameter();
+        p4.setTitle("是否为ajax请求");
+        p4.setDescription("");
+        p4.setHtmlType(ParameterHtmlType.inputHidden);
+        p4.setCustomName(PARAM_REQUEST_BY_AJAX);
+        p4.setStyle("");
+        
+        
         parameters.add(p1);
+        parameters.add(p2);
+        parameters.add(p3);
+        parameters.add(p4);
         
         return queryDefinition;
 	    

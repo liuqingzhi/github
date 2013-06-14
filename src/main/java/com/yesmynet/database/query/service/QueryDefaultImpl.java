@@ -14,6 +14,8 @@ import java.util.regex.Pattern;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.StatementCallback;
@@ -38,6 +40,7 @@ import com.yesmynet.database.query.dto.DatabaseDialect;
  */
 public class QueryDefaultImpl  implements Query
 {
+	Logger logger=LoggerFactory.getLogger(this.getClass());
     /**
      * 关于本查询的设置，包括所有的参数
      */
@@ -374,6 +377,8 @@ public class QueryDefaultImpl  implements Query
 		final String splitter=";";
 		
 		List<String> splitSQL = splitSQL(sql,pairs,splitter);
+		logger.debug("分隔后的SQL:{}",splitSQL);
+		
 		if(!CollectionUtils.isEmpty(splitSQL))
 		{
 			for(String sqlStr:splitSQL)
@@ -385,13 +390,7 @@ public class QueryDefaultImpl  implements Query
 				}
 				if(StringUtils.hasText(sqlStr))
 				{
-					boolean select=false;
-					if(sqlStr.length()>=6)
-					{
-						String substring = sqlStr.substring(0, 6);
-						if("select".equalsIgnoreCase(substring))
-							select=true;
-					}
+					boolean select=isSqlSelect(sqlStr);
 					
 					SqlDto s=new SqlDto();
 					s.setSql(sqlStr);
@@ -403,6 +402,68 @@ public class QueryDefaultImpl  implements Query
 		}
 		return re;
     }
+    /**
+     * 判断sql是不是一个select语句
+     * @param sql
+     * @return
+     */
+    private boolean isSqlSelect(String sql)
+    {
+    	boolean re=false;
+    	
+    	Set<SignPair> pairs = new HashSet<SignPair>();
+		boolean finished=false;
+		String sqlSelf=sql.trim();
+		
+		pairs.add(new SignPair("/\\*", "\\*/"));
+		pairs.add(new SignPair("--", "\n"));
+		
+		String patternStr=getALLSignPair(pairs,0);
+		Pattern pattern=Pattern.compile(patternStr);
+		Matcher matcher = pattern.matcher(sqlSelf);
+		
+		while(!finished)
+		{
+			matcher = pattern.matcher(sqlSelf);
+			if(matcher.find())
+			{
+				String group = matcher.group();
+				int start = matcher.start();
+				int end = matcher.end();
+				String endStr =this.getSignPairEnd(group, pairs);
+				int indexOf =sqlSelf.length();
+				
+				Pattern endPattern = Pattern.compile(endStr);
+				Matcher matcher2 = endPattern.matcher(sqlSelf);
+				if(matcher2.find())
+				{
+					indexOf=matcher2.end();
+				}
+				sqlSelf=sqlSelf.substring(0,start)+sqlSelf.substring(indexOf);
+				
+				
+			}
+			else
+			{
+				finished=true;
+			}
+				
+		}
+    	
+		sqlSelf=sqlSelf.trim();
+		String substring1 = sqlSelf.substring(0,6);
+		
+		if("select".equalsIgnoreCase(substring1))
+			re=true;
+		
+    	return re;
+    }
+    /**
+     * 显示结果
+     * @param rs
+     * @return
+     * @throws Exception
+     */
     private String ShowResultSet(final java.sql.ResultSet rs) throws Exception
     {
         StringBuffer sb=new StringBuffer();
@@ -501,7 +562,7 @@ public class QueryDefaultImpl  implements Query
 	 */
 	private List<String> splitSQL(final String sql,final Set<SignPair> pairs,final String splitter) {
 		List<String> re=new ArrayList<String>();
-		String sqlSelf=sql;
+		String sqlSelf=sql.trim();
 		String patternStr=getALLSignPair(pairs,0);
 		patternStr+="|"+splitter;//要在sql中查找的符号是所有的标记的开关和分隔符
 		Pattern pattern=Pattern.compile(patternStr);
@@ -525,7 +586,7 @@ public class QueryDefaultImpl  implements Query
 				String tmp=sqlSelf.substring(0, end);
 				currentSplittedSql+=tmp;
 				sqlSelf=sqlSelf.substring(end);
-				System.out.println("\t\ti="+i+",group="+group+",end="+end+",currentSplittedSql="+currentSplittedSql+",sqlSefl="+sqlSelf);
+				logger.debug("\t\ti="+i+",group="+group+",end="+end+",currentSplittedSql="+currentSplittedSql+",sqlSefl="+sqlSelf);
 				
 				if(group.equals(splitter))
 				{
@@ -548,7 +609,7 @@ public class QueryDefaultImpl  implements Query
 					currentSplittedSql+=sqlSelf.substring(0,indexOf);
 					sqlSelf=sqlSelf.substring(indexOf);
 					
-					System.out.println("\t\ti="+i+",endStr="+ endStr +",indexOf="+indexOf+",currentSplittedSql="+currentSplittedSql+"sqlSefl="+sqlSelf);
+					logger.debug("\t\ti="+i+",endStr="+ endStr +",indexOf="+indexOf+",currentSplittedSql="+currentSplittedSql+"sqlSefl="+sqlSelf);
 				}
 				
 			}

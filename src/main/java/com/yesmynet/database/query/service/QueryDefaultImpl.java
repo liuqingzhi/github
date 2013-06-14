@@ -189,9 +189,9 @@ public class QueryDefaultImpl  implements Query
      */
     private String doWithException(Exception e)
     {
-    	String re="";
-    	re=ExceptionUtils.getStackTrace(e);
-	    
+    	String re="<pre>";
+    	re+=ExceptionUtils.getStackTrace(e);
+	    re+="</pre>";
     	return re;
     }
     /**

@@ -19,6 +19,8 @@
       <property name="cache" value="true"/>
       <property name="prefix" value=""/>
       <property name="suffix" value=".html"/>
+      <property name="requestContextAttribute" value="requestContext"></property><!-- 该配置可以在freemarker中使用如下代码得到context path:${requestContext.contextPath}  -->
+      
     </bean>
  
     <context:component-scan

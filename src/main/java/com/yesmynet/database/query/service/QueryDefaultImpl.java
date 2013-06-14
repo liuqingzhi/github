@@ -113,6 +113,15 @@ public class QueryDefaultImpl  implements Query
         List<SqlDto> sqlList=splitSql(sql);
         if(!CollectionUtils.isEmpty(sqlList))
         {
+        	boolean tabbedContent=false;//是否使用tab选项卡显示内容
+        	int i=1;
+        	StringBuilder tabHeaders=new StringBuilder();
+        	StringBuilder tabContents=new StringBuilder();
+        	
+        	tabHeaders.append("<ul>");
+        	
+        	if(sqlList.size()>1) tabbedContent=true;
+        	
         	for(SqlDto sqlDto:sqlList)
         	{
         		String sqlResult="";
@@ -135,13 +144,54 @@ public class QueryDefaultImpl  implements Query
 				{
 					sqlResult=doWithException(e);
 				}
-        		resultContent.append(sqlResult);
+        		String tabHeader = getTabHeader(sqlDto,i);
+        		String tabContent=getTabContent(sqlResult,i);
+        		
+        		tabHeaders.append(tabHeader);
+        		tabContents.append(tabContent);
+        		
+        		i++;
         	}
-        }
+        	tabHeaders.append("</ul>\n");
+        	if(tabbedContent)
+        	{
+        		resultContent.append("<div id='tabs'>\n");
+            	resultContent.append(tabHeaders);
+            	resultContent.append(tabContents);
+            	resultContent.append("</div>\n");
+
+            	resultContent.append("\n").append("<script>\n").append("$(function() {\n").append("$( \"#tabs\" ).tabs();\n").append("});\n").append("</script>\n");
+        	}
+        	else
+        	{
+        		resultContent.append(tabContents);
+        	}
+        	        }
         
 
         re.setContent(resultContent.toString());
         return re;
+    }
+    /**
+     * 得到tab选项卡的头，用来点击这个头可以显示tab页的内容。
+     * @param sql 执行的SQL
+     * @param tabListIndex 这个tab是所有tab选项卡的第几个。
+     * @return
+     */
+    private String getTabHeader(SqlDto sql,int tabListIndex)
+    {
+    	String re="<li><a href=\"#tabs-"+tabListIndex+"\">SQL "+ tabListIndex +"</a></li>\n";
+    	return re;
+    }
+    /**
+     * 得到tab选项页的内容
+     * @param content
+     * @return
+     */
+    private String getTabContent(String content,int tabListIndex)
+    {
+    	String re="<div id='tabs-"+ tabListIndex +"'>"+ content +"</div>";
+    	return re;
     }
     private String executeUpdataSql(String sql,DataSourceConfig dataSourceConfig)
     {

@@ -48,6 +48,11 @@ public class Parameter extends BaseDto
 	 */
 	private String customName;
 	/**
+	 * 在页面上显示参数时的样式，如：可以使用css定义输入框的大小.
+	 * 本参数只要style="..."，双引号里的内容，不要带上style=""，如下是好的样式：width:150px;font-size:24px;
+	 */
+	private String style;
+	/**
 	 * 参数运行时的值
 	 */
 	private String value;
@@ -118,6 +123,12 @@ public class Parameter extends BaseDto
 	public void setCustomName(String customName)
 	{
 		this.customName = customName;
+	}
+	public String getStyle() {
+		return style;
+	}
+	public void setStyle(String style) {
+		this.style = style;
 	}
 	public String getValue()
 	{

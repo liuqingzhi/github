@@ -835,7 +835,7 @@ public class QueryDefaultImpl  implements Query
         queryDefinition.setId("-1");
         queryDefinition.setName("默认查询");
         queryDefinition.setDescription("系统实现的默认查询");
-        queryDefinition.setAfterParameterHtml("显示完所有参数后要显示的html,现在还没有");
+        queryDefinition.setAfterParameterHtml("");//显示完所有参数后要显示的html,现在还没有
         queryDefinition.setShowExecuteButton(true);
         
         Parameter p1=new Parameter();
@@ -843,7 +843,7 @@ public class QueryDefaultImpl  implements Query
         p1.setDescription("在这里输入SQL");
         p1.setHtmlType(ParameterHtmlType.textArea);
         p1.setCustomName(PARAM_SQL);
-        
+        p1.setStyle("width: 1000px; height: 200px;");
         parameters.add(p1);
         
         return queryDefinition;

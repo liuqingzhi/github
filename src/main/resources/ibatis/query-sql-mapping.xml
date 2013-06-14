@@ -20,6 +20,7 @@
         <result property="description"  column="description"/>
         <result property="htmlType"  column="html_Type"/>
         <result property="customName"  column="custom_Name"/>
+        <result property="style"  column="style"/>
     </resultMap>
 
 	<!--得到查询-->

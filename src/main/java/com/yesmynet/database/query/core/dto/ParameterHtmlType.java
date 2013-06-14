@@ -12,15 +12,15 @@ public  enum ParameterHtmlType
 	/**
 	 * 单行文本框
 	 */
-	inputText("单行文本","<input type=''text'' name=''{0}'' value=''{1}'' >"),
+	inputText("单行文本","<input type=''text'' name=''{1}'' style=''{2}'' value=''{0}'' >"),
 	/**
 	 * 多行文本框
 	 */
-	textArea("多行文本","<textarea rows=''6'' cols=''70'' name=''{0}''>{1}</textarea>"),
+	textArea("多行文本","<textarea name=''{1}'' style=''{2}''>{0}</textarea>"),
 	/**
      * html中的hidden输入控件 
      */
-    inputHidden("Hidden输入控件","<input type=''hidden'' name=''{0}'' value=''{1}'' >")
+    inputHidden("Hidden输入控件","<input type=''hidden'' name=''{1}''  style=''{2}'' value=''{0}'' >")
     ;
 	/**
 	 * 显示在界面上的类型名称

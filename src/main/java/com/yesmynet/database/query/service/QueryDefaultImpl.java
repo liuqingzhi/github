@@ -281,11 +281,45 @@ public class QueryDefaultImpl  implements Query
     	if(paging)
     	{
     		//分页了，则显示分页导航
-    		String page1=String.format("当前第%s页,共%s页，共%s条记录",pagingInfo.getCurrentPage(),pagingInfo.getPageCount(),pagingInfo.getRecordCount());
+    		String page1=getPageNavigation(pagingInfo);
+    		re=page1+re;
     		re+=page1;
     	}
     	
     	return re;
+    }
+    /**
+     * 显示分页的导航，可以到达下一页，上一页等
+     * @param pagingInfo
+     * @return
+     */
+    private String getPageNavigation(PagingDto pagingInfo)
+    {
+    	String re="";
+    	boolean canGoNext=pagingInfo.getCurrentPage()<pagingInfo.getPageCount();
+    	boolean canGoPrevious=pagingInfo.getCurrentPage()>1;
+    	
+    	re=String.format("当前第%s页/共%s页，共%s条记录",pagingInfo.getCurrentPage(),pagingInfo.getPageCount(),pagingInfo.getRecordCount());
+    	if(pagingInfo.getCurrentPage()>1)
+    	{
+    		re+=",<a href=\"javascript:goPage('"+ (pagingInfo.getCurrentPage()-1) +"')\">上一页</a>";
+    	}
+    	else
+    	{
+    		re+=",<span>上一页</span>";
+    	}
+    	re+=String.format(",到第<input type=\"text\" name=\"%s\" value=\"%s\" size=\"3\">页%s",PARAM_CURRENT_PAGE,pagingInfo.getCurrentPage(),pagingInfo.getPageCount()>0?"<a href=\"javascript:goPage('')\">确定</a>":"<span>确定</span>" );
+    	
+    	if(pagingInfo.getCurrentPage()<pagingInfo.getPageCount())
+    	{
+    		re+=",<a href=\"javascript:goPage('"+ (pagingInfo.getCurrentPage()+1) +"')\">下一页</a>";
+    	}
+    	else
+    	{
+    		re+=",<span>下一页</span>";
+    	}
+    	return re;
+		
     }
     /**
      * 得到分页的数据

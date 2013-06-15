@@ -51,16 +51,17 @@ public class QueryDefaultImpl  implements Query
     private List<DatabseDialectService> databaseDialectServices;
     /**
      * 查询数据库时，不进行分页的最多记录数，如果查询的记录数大于本参数则进行分页
+     * 如果设为负数意味着查询总是分页。
      */
-    private Long noPageMaxResult=300L;
+    private Long noPageMaxResult=-1L;
     /**
      * 查询分页时，一页显示的记录数的最大数
      */
-    private Long maxPageSize=200L;
+    private Long maxPageSize=100L;
     /**
      * 默认每页显示的记录数
      */
-    private Long pageSizeDefault=50L;
+    private Long pageSizeDefault=20L;
     /**
      * 在request参数名称，用来得到要执行的sql
      */
@@ -256,6 +257,7 @@ public class QueryDefaultImpl  implements Query
             }
     	}
     	final String sqlToExecuteSql=sqlToExecute;
+    	final Long recordBegin=pagingInfo.getRecordBegin();
     	
         re=jdbcTemplate.execute(new StatementCallback<String>(){
 
@@ -269,7 +271,7 @@ public class QueryDefaultImpl  implements Query
                 rs=stmt.getResultSet();
                 try
                 {
-                    re=ShowResultSet(rs);
+                    re=ShowResultSet(rs,recordBegin);
                 } catch (Exception e)
                 {
                     throw new RuntimeException(e);
@@ -299,6 +301,8 @@ public class QueryDefaultImpl  implements Query
     	Long pageCount=recordCountInDB/pageSizeSelf;
     	pageCount+=recordCountInDB % pageSizeSelf>0?1:0;
     	Long currentPageSelf=currentPage>pageCount?pageCount:currentPage;
+    	if(currentPageSelf<1)
+    		currentPageSelf=1L;
     	Long recordBegin=(currentPageSelf-1)*pageSizeSelf+1;
     	Long recordEnd= currentPageSelf*pageSizeSelf;
     	
@@ -444,14 +448,16 @@ public class QueryDefaultImpl  implements Query
      * @return
      * @throws Exception
      */
-    private String ShowResultSet(final java.sql.ResultSet rs) throws Exception
+    private String ShowResultSet(final java.sql.ResultSet rs,final Long recordBegin) throws Exception
     {
         StringBuffer sb=new StringBuffer();
         StringBuffer sbReturnValue=new StringBuffer();
         java.sql.ResultSetMetaData rsmd =null; 
         int iColumnCount=0,i=0;
         String strCurrentColumnTypeName="",strCurrentColumnValue="",strColumnLength="";
-        int iResultSetCount=0;
+        Long iResultSetCountBegin=recordBegin;
+        Long iResultSetCount=iResultSetCountBegin;
+        boolean hasRecord=false;
         try
         {
             //sb.append("<table width=100% border=1 >\n");
@@ -481,8 +487,8 @@ public class QueryDefaultImpl  implements Query
                 }
                 sb.append(" </tr>\n");
                 
+                iResultSetCount--;
                 //输出数据
-                iResultSetCount=0;
                 while(rs.next())
                 {
                     sb.append(" <tr>\n");
@@ -503,15 +509,23 @@ public class QueryDefaultImpl  implements Query
                         sb.append("     <td>"+ strCurrentColumnValue +"</td>\n");
                     }
                     sb.append(" </tr>\n");
-                    iResultSetCount++;              
+                    iResultSetCount++;
+                    hasRecord=true;
                 }
                 
+            }
+            
+            if(!hasRecord)
+            {
+            	//这说明ResultSet是空的，没有数据
+            	iResultSetCountBegin=0L;
+            	iResultSetCount=0L;
             }
             
             
             sbReturnValue.append("<table width=100% border=1 >\n");
             sbReturnValue.append("  <tr>\n");
-            sbReturnValue.append("      <th align='left' colspan='"+ iColumnCount +"'>共查询到<span style='color:red'>"+ iResultSetCount +"</span>条记录</th>\n");
+            sbReturnValue.append("      <th align='left' colspan='"+ iColumnCount +"'>当前显示从第<span style='color:red'>"+ iResultSetCountBegin +"</span>条到第<span style='color:red'>"+ iResultSetCount +"</span>条记录</th>\n");
             sbReturnValue.append("  <tr>\n");
             sbReturnValue.append(sb);
             sbReturnValue.append("</table>\n");

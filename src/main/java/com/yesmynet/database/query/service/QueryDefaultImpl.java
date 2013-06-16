@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +34,7 @@ import com.yesmynet.database.query.core.dto.QueryDefinition;
 import com.yesmynet.database.query.core.dto.QueryReult;
 import com.yesmynet.database.query.dto.DataSourceConfig;
 import com.yesmynet.database.query.dto.DatabaseDialect;
+import com.yesmynet.database.query.dto.SystemParameterName;
 /**
  * 查询的默认实现，就是在界面上显示一个输入sql的多行文本框，用来执行给定的SQL
  * @author 刘庆志
@@ -75,7 +77,7 @@ public class QueryDefaultImpl  implements Query
      */
     private final String PARAM_CURRENT_PAGE="currentPage";
     /**
-     * 是否为ajax请求只要有值就是ajax请求
+     * 是否为ajax请求，只要本参数有值（不管值是什么）就是ajax请求
      */
     private final String PARAM_REQUEST_BY_AJAX="ajaxRequest";
     
@@ -93,11 +95,12 @@ public class QueryDefaultImpl  implements Query
         final Map<String,Parameter> parameterMap=new HashMap<String,Parameter>();
         for (Parameter i : parameters) parameterMap.put(i.getCustomName(),i);
         StringBuilder resultContent=new StringBuilder();
-        final String sql=parameterMap.get("sqlCode").getValue();
+        final String sql=parameterMap.get(PARAM_SQL).getValue();
+        final Boolean ajaxRequest=StringUtils.hasText(parameterMap.get(PARAM_REQUEST_BY_AJAX).getValue());
         List<SqlDto> sqlList=splitSql(sql);
         if(!CollectionUtils.isEmpty(sqlList))
         {
-        	boolean tabbedContent=false;//是否使用tab选项卡显示内容
+        	boolean tabbedContent=true;//是否使用tab选项卡显示内容
         	int i=1;
         	StringBuilder tabHeaders=new StringBuilder();
         	StringBuilder tabContents=new StringBuilder();
@@ -109,6 +112,7 @@ public class QueryDefaultImpl  implements Query
         	for(SqlDto sqlDto:sqlList)
         	{
         		String sqlResult="";
+        		String tabShowResultDivId=getRandomString();//getShowResultDivId(i);
         		
         		try
 				{
@@ -116,7 +120,7 @@ public class QueryDefaultImpl  implements Query
 					{
 						Long pageSize=getParameterValue(PARAM_PAGE_SIZE,parameterMap,pageSizeDefault);
 						Long currentPage=getParameterValue(PARAM_CURRENT_PAGE,parameterMap,1L);
-						sqlResult=executeSelectSql(sqlDto.getSql(),pageSize,currentPage,dataSourceConfig);
+						sqlResult=executeSelectSql(sqlDto.getSql(),pageSize,currentPage,dataSourceConfig,i,tabShowResultDivId);
 						
 					}
 					else
@@ -128,8 +132,11 @@ public class QueryDefaultImpl  implements Query
 				{
 					sqlResult=doWithException(e);
 				}
-        		String tabHeader = getTabHeader(sqlDto,i);
-        		String tabContent=getTabContent(sqlResult,i);
+        		String tabHeader = getTabHeader(sqlDto,i,tabShowResultDivId);
+        		String tabContent=sqlResult;
+        		
+        		if(tabbedContent && !ajaxRequest)
+        			tabContent=getTabContent(sqlResult,tabShowResultDivId);
         		
         		tabHeaders.append(tabHeader);
         		tabContents.append(tabContent);
@@ -137,7 +144,7 @@ public class QueryDefaultImpl  implements Query
         		i++;
         	}
         	tabHeaders.append("</ul>\n");
-        	if(tabbedContent)
+        	if(tabbedContent && !ajaxRequest)
         	{
         		resultContent.append("<div id='tabs'>\n");
             	resultContent.append(tabHeaders);
@@ -150,11 +157,44 @@ public class QueryDefaultImpl  implements Query
         	{
         		resultContent.append(tabContents);
         	}
-        	        }
+        	
+        	String pageNavigationScriptFunction = getPageNavigationScriptFunction();
+        	resultContent.append(pageNavigationScriptFunction);
+        }
         
-
+        
         re.setContent(resultContent.toString());
+        re.setOnlyShowContent(ajaxRequest);
         return re;
+    }
+    /**
+     * 在页面上定义一个javascript函数，以进行分页操作。
+     * @return
+     */
+    private String getPageNavigationScriptFunction()
+    {
+    	StringBuilder re=new StringBuilder();
+    	
+    	re.append("<script type=\"text/javascript\">\n");
+    	re.append("		function goPage(toReplaceContentDivId,targetPageNum)\n");
+    	re.append("		{\n");
+    	re.append("			var url=\"/query.do\";\n");
+    	re.append("			var datasourceId=$(\"#\"+toReplaceContentDivId+\" #SystemDataSourceId\").val();\n");
+    	re.append("			var sql=$(\"#\"+toReplaceContentDivId+\" #sqlCode\").val();\n");
+    	re.append("			\n");
+    	re.append("			$.ajax({\n");
+    	re.append("				  type: \"POST\",\n");
+    	re.append("				  url: url,\n");
+    	re.append("				  dataType:\"html\",\n");
+    	re.append("				  data: { \"SystemQueryExecute\":\"\",\"ajaxRequest\":\"1\",\"SystemDataSourceId\": datasourceId, \"sqlCode\": sql,\"currentPage\":targetPageNum },\n");
+    	re.append("				  success: function(data, textStatus, jqXHR) {\n");
+    	re.append("					  $(\"#\"+toReplaceContentDivId).html(data);\n");
+    	re.append("				  }\n");
+    	re.append("				});\n");
+    	re.append("		}\n");
+    	re.append("	</script>\n");
+    	
+    	return re.toString();
     }
     /**
      * 得到tab选项卡的头，用来点击这个头可以显示tab页的内容。
@@ -162,9 +202,19 @@ public class QueryDefaultImpl  implements Query
      * @param tabListIndex 这个tab是所有tab选项卡的第几个。
      * @return
      */
-    private String getTabHeader(SqlDto sql,int tabListIndex)
+    private String getTabHeader(SqlDto sql,int tabListIndex,String tabContentDivId)
     {
-    	String re="<li><a href=\"#tabs-"+tabListIndex+"\">SQL "+ tabListIndex +"</a></li>\n";
+    	String re="<li><a href=\"#"+ tabContentDivId +"\">SQL "+ tabListIndex +"</a></li>\n";
+    	return re;
+    }
+    /**
+     * 得到显示查询结果的div的ID
+     * @param tabListIndex
+     * @return
+     */
+    private String getShowResultDivId(int tabListIndex)
+    {
+    	String re="tabs-"+ tabListIndex +"";
     	return re;
     }
     /**
@@ -172,9 +222,10 @@ public class QueryDefaultImpl  implements Query
      * @param content
      * @return
      */
-    private String getTabContent(String content,int tabListIndex)
+    private String getTabContent(String content,String tabResultDivId)
     {
-    	String re="<div id='tabs-"+ tabListIndex +"'>"+ content +"</div>";
+    	String re="";
+    	re="<div id='"+ tabResultDivId +"'>"+ content +"</div>";
     	return re;
     }
     private String executeUpdataSql(String sql,DataSourceConfig dataSourceConfig)
@@ -231,7 +282,7 @@ public class QueryDefaultImpl  implements Query
      * @param dataSourceConfig
      * @return
      */
-    private String executeSelectSql(String sql,Long pageSize,Long currentPage,DataSourceConfig dataSourceConfig)
+    private String executeSelectSql(String sql,Long pageSize,Long currentPage,DataSourceConfig dataSourceConfig,int sqlIndex,String showResultDivId)
     {
     	String re="";
     	DatabaseDialect databaseDialect = dataSourceConfig.getDatabaseDialect();
@@ -280,39 +331,82 @@ public class QueryDefaultImpl  implements Query
             }});
     	if(paging)
     	{
+    		//String sqlIndexDivId="sqlPageDiv"+sqlIndex;
     		//分页了，则显示分页导航
-    		String page1=getPageNavigation(pagingInfo);
-    		re=page1+re;
+    		
+    		String showResultDivIdContainer=getRandomString();
+    		//String pageDataDivIdContainer=getRandomString();
+    		String page1=getPageNavigation(pagingInfo,showResultDivIdContainer);
+    		String pageDatas=showPagingNavigation(sql,dataSourceConfig,pagingInfo);//,pageDataDivIdContainer);
+    		
+    		re="<div id='"+ showResultDivIdContainer +"'>"+pageDatas+page1+re;
     		re+=page1;
+    		re+="</div>";
+    		
+            
+    		
     	}
     	
     	return re;
+    }
+    /**
+     * 得到一个随机字符串作为显示查询结果的div的ID，这个ID不能重复，以准备使用ajax更新结果
+     * @return
+     */
+    private String getRandomString()
+    {
+    	String re="";
+    	re=UUID.randomUUID().toString();
+    	return re;
+    }
+    /**
+     * 输出用于分页控制的一些变量 
+     * @param sql 要执行的SQL，是用户提交的sql，不带分页
+     * @param dataSourceConfig 数据源配置
+     * @param pagingInfo 分页的信息
+     * @param sqlIndex 当前执行的SQL是所有SQL中的第几个SQL语句，用此序号在html中产生一个ID
+     * @return 在html中分页相关的所有数据
+     */
+    private String showPagingNavigation(String sql,DataSourceConfig dataSourceConfig,PagingDto pagingInfo)//,String sqlIndexDivId)
+    {
+    	StringBuilder re=new StringBuilder();
+    	
+    	//re.append("<div id='").append(sqlIndexDivId).append("' style='display:none;'>");
+    	re.append("<textarea id='"+ PARAM_SQL +"' style='display:none;'>").append(sql).append("</textarea>\n");//使用textarea以避免sql中的特殊符号导致html出错
+    	re.append("<input type='hidden' id='"+ SystemParameterName.DataSourceId.getParamerName() +"' value='"+ dataSourceConfig.getId() +"'>\n");
+    	re.append("<input type='hidden' id='"+ PARAM_PAGE_SIZE +"' value='"+ pagingInfo.getPageSize() +"'>\n");
+    	re.append("<input type='hidden' id='"+ PARAM_CURRENT_PAGE +"' value='"+ pagingInfo.getCurrentPage() +"'>\n");
+    	re.append("<input type='hidden' id='"+ PARAM_REQUEST_BY_AJAX +"' value=''>\n");
+    	
+    	//re.append("</div>");
+    	
+    	return re.toString();
     }
     /**
      * 显示分页的导航，可以到达下一页，上一页等
      * @param pagingInfo
      * @return
      */
-    private String getPageNavigation(PagingDto pagingInfo)
+    private String getPageNavigation(PagingDto pagingInfo,String resultContentDivId)
     {
     	String re="";
-    	boolean canGoNext=pagingInfo.getCurrentPage()<pagingInfo.getPageCount();
-    	boolean canGoPrevious=pagingInfo.getCurrentPage()>1;
     	
     	re=String.format("当前第%s页/共%s页，共%s条记录",pagingInfo.getCurrentPage(),pagingInfo.getPageCount(),pagingInfo.getRecordCount());
     	if(pagingInfo.getCurrentPage()>1)
     	{
-    		re+=",<a href=\"javascript:goPage('"+ (pagingInfo.getCurrentPage()-1) +"')\">上一页</a>";
+    		re+=",<a href=\"javascript:goPage('"+ resultContentDivId +"','"+ (pagingInfo.getCurrentPage()-1) +"')\">上一页</a>";
     	}
     	else
     	{
     		re+=",<span>上一页</span>";
     	}
-    	re+=String.format(",到第<input type=\"text\" name=\"%s\" value=\"%s\" size=\"3\">页%s",PARAM_CURRENT_PAGE,pagingInfo.getCurrentPage(),pagingInfo.getPageCount()>0?"<a href=\"javascript:goPage('')\">确定</a>":"<span>确定</span>" );
+    	String goPageByNumInputName="goPageByNum";
+    	String goPageNum="$('#"+ resultContentDivId +" #"+ goPageByNumInputName +"').val()";
+    	re+=String.format(",到第<input type=\"text\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"3\">页%s",goPageByNumInputName,goPageByNumInputName,pagingInfo.getCurrentPage(),pagingInfo.getPageCount()>0?"<a href=\"javascript:goPage('"+ resultContentDivId +"',"+ goPageNum +")\">确定</a>":"<span>确定</span>" );
     	
     	if(pagingInfo.getCurrentPage()<pagingInfo.getPageCount())
     	{
-    		re+=",<a href=\"javascript:goPage('"+ (pagingInfo.getCurrentPage()+1) +"')\">下一页</a>";
+    		re+=",<a href=\"javascript:goPage('"+ resultContentDivId +"','"+ (pagingInfo.getCurrentPage()+1) +"')\">下一页</a>";
     	}
     	else
     	{

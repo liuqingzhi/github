@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
@@ -30,6 +32,7 @@ import com.yesmynet.database.query.core.service.QueryDefinitionService;
 import com.yesmynet.database.query.core.service.QueryExecutorService;
 import com.yesmynet.database.query.core.service.QueryRenderService;
 import com.yesmynet.database.query.dto.DataSourceConfig;
+import com.yesmynet.database.query.dto.SystemParameterName;
 
 /**
  * 显示出查询的界面，并执行查询
@@ -39,6 +42,7 @@ import com.yesmynet.database.query.dto.DataSourceConfig;
 @Controller
 public class QueryController
 {
+	Logger logger=LoggerFactory.getLogger(this.getClass());
     /**
      * 数据源配置的service
      */
@@ -59,43 +63,7 @@ public class QueryController
 	 */
 	@Resource(name = "queryExecutorService")
 	private QueryExecutorService queryExecutorService;
-	/**
-	 * 系统使用的request参数名，在查询定义时，应该不要让查询的参数名与
-	 * 这里使用的参数名有一样的。
-	 * @author 刘庆志
-	 *
-	 */
-	private enum SystemParameterName
-	{
-		/**
-		 * 表示要查看或要执行的查询的Id
-		 */
-		QueryId("SystemQueryId"),
-		/**
-		 * 表示要执行查询的命令，当本参数有值，不管值是什么都表示要执行查询
-		 */
-		QueryExecute("SystemQueryExecute"),
-		/**
-         * 表示要使用哪个数据源
-         * 在执行查询时，可以从多个数据源中选择一个。
-         */
-        DataSourceId("SystemDataSourceId")
-        
-		;
-		/**
-		 * http参数名称
-		 */
-		private String paramerName;
-		private SystemParameterName(String httpParamerName)
-		{
-			this.paramerName=httpParamerName;
-		}
-		public String getParamerName()
-		{
-			return paramerName;
-		}
-		
-	}
+	
 	/**
 	 * 显示查询的界面
 	 * @param queryId
@@ -106,6 +74,7 @@ public class QueryController
 	@RequestMapping(value = "/query.do")/*@RequestMapping(value="/query/{ownerId}/view.do", method=RequestMethod.GET)*/
 	public String showQuery(HttpServletRequest request,HttpServletResponse response,Model model) throws IOException
     {
+		String viewName="showQuery";
 	    String queryId=request.getParameter(SystemParameterName.QueryId.getParamerName());//要使用的查询的ID
 	    String queryExecute=request.getParameter(SystemParameterName.QueryExecute.getParamerName());//是否要执行查询
         String dataSourceId=request.getParameter(SystemParameterName.DataSourceId.getParamerName());//使用的数据源
@@ -130,15 +99,24 @@ public class QueryController
                 queryResult = queryExecutorService.executeQuery(queryInstance, queryParameters,dataSourceById);
             }
             
-            if(queryResult!=null && queryResult.getContentInputStream()!=null)
+            if(queryResult!=null )
             {
-                FileCopyUtils.copy(queryResult.getContentInputStream(), response.getOutputStream());
-                return null;
+            	if(queryResult.getContentInputStream()!=null)
+                {	
+            		FileCopyUtils.copy(queryResult.getContentInputStream(), response.getOutputStream());
+            		return null;
+                }
+            	else if(queryResult.getOnlyShowContent()!=null && queryResult.getOnlyShowContent())
+            	{
+            		viewName="showQueryOnlyResult";	
+            	}
+                	
             }
+            
         } catch (Exception e)
         {
             queryExecuteException=e;
-            e.printStackTrace();
+            logger.debug("执行用户请求的sql出错了",e);
         }
 		String queryExecuteExceptionString = printException(queryExecuteException);
 		
@@ -149,7 +127,7 @@ public class QueryController
 		model.addAttribute("queryExecuteException", queryExecuteException);
 		model.addAttribute("queryExecuteExceptionString", queryExecuteExceptionString);
 		
-        return "showQuery";
+        return viewName;
     }
 	/**
 	 * 编辑一个查询

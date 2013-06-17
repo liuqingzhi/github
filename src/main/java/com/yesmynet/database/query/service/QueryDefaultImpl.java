@@ -178,7 +178,7 @@ public class QueryDefaultImpl  implements Query
     	re.append("<script type=\"text/javascript\">\n");
     	re.append("		function goPage(toReplaceContentDivId,targetPageNum)\n");
     	re.append("		{\n");
-    	re.append("			var url=\"/query.do\";\n");
+    	re.append("			var url=requestContext+\"/query.do\";\n");
     	re.append("			var datasourceId=$(\"#\"+toReplaceContentDivId+\" #SystemDataSourceId\").val();\n");
     	re.append("			var sql=$(\"#\"+toReplaceContentDivId+\" #sqlCode\").val();\n");
     	re.append("			\n");

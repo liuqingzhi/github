@@ -32,6 +32,8 @@ import org.springframework.util.StringUtils;
 
 import com.ibatis.sqlmap.client.SqlMapExecutor;
 import com.yesmynet.database.query.dto.DBUpdateDTO;
+import com.yesmynet.database.query.dto.SqlDto;
+import com.yesmynet.database.query.utils.SqlSplitUtils;
 /**
  * 初始始化数据库
  * @author 刘庆志
@@ -97,6 +99,7 @@ public class DatabaseIniterService extends SqlMapClientDaoSupport
 		if(StringUtils.hasText(sql))
 		{
 			String[] splitSql = splitSql(sql);
+			
 			if(!ArrayUtils.isEmpty(splitSql) )
 			{
 				jdbcTemplat.batchUpdate(splitSql);
@@ -138,40 +141,21 @@ public class DatabaseIniterService extends SqlMapClientDaoSupport
 	private String[] splitSql(String sql)
 	{
 		String[] re=null;
-		List<String> sqlList=new ArrayList<String>(); 
-		String splitor=";";
-		String[] splitted = sql.split(splitor, -1);
-		if(splitted!=null && splitted.length>0)
+		List<String> sqls=new ArrayList<String>(); 
+		List<SqlDto> splitSql = SqlSplitUtils.splitSql(sql);
+		if(!CollectionUtils.isEmpty(splitSql ))
 		{
-			Pattern pattern = Pattern.compile("'");
-			for(int i=0;i<splitted.length;i++)
+			for(SqlDto sqlDto:splitSql)
 			{
-				String one=splitted[i];
-				Matcher  matcher = pattern.matcher(one);
-				int count = 0;
-		        while (matcher.find())
-		            count++;
-				if(count % 2!=0)
-				{
-					if(i<splitted.length-1)
-					{
-						splitted[i]="";
-						String next=splitted[i+1];
-						splitted[i+1]=one+splitor+next;
-					}
-				}
-			}
-			
-			for(int i=0;i<splitted.length;i++)
-			{
-				String one=splitted[i];
-				
-				if(StringUtils.hasText(one))
-					sqlList.add(one);
+				String sql2 = sqlDto.getSql();
+				if(StringUtils.hasText(sql2))
+					sqls.add(sql2);
 			}
 		}
-		
-		re=sqlList.toArray(new String[0]);
+		if(!CollectionUtils.isEmpty(sqls ))
+		{
+			re=sqls.toArray(new String[0]);
+		}
 		
 		return re;
 	}

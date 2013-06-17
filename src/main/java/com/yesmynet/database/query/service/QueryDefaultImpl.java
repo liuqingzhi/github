@@ -1,5 +1,7 @@
 package com.yesmynet.database.query.service;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -18,6 +20,8 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.BadSqlGrammarException;
+import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.StatementCallback;
 import org.springframework.util.CollectionUtils;
@@ -113,21 +117,34 @@ public class QueryDefaultImpl  implements Query
         	{
         		String sqlResult="";
         		String tabShowResultDivId=getRandomString();//getShowResultDivId(i);
-        		
+        		Long pageSize=getParameterValue(PARAM_PAGE_SIZE,parameterMap,pageSizeDefault);
+				Long currentPage=getParameterValue(PARAM_CURRENT_PAGE,parameterMap,1L);
         		try
 				{
 					if(sqlDto.isSelect())
 					{
-						Long pageSize=getParameterValue(PARAM_PAGE_SIZE,parameterMap,pageSizeDefault);
-						Long currentPage=getParameterValue(PARAM_CURRENT_PAGE,parameterMap,1L);
 						sqlResult=executeSelectSql(sqlDto.getSql(),pageSize,currentPage,dataSourceConfig,i,tabShowResultDivId);
-						
 					}
 					else
 					{
 						sqlResult=executeUpdataSql(sqlDto.getSql(),dataSourceConfig);
 					}
 				}
+        		catch (BadSqlGrammarException e)
+        		{
+        			Throwable cause = e.getCause();
+        			String message = cause.getMessage();
+        			String patternStr="ORA-00918: column ambiguously defined";
+        			Pattern pattern=Pattern.compile(patternStr);
+        			Matcher matcher = pattern.matcher(message);
+        			
+        			if(matcher.find())
+        			{
+        				sqlResult=executeSelectSqlPageInStatement(sqlDto.getSql(),pageSize,currentPage,dataSourceConfig,i,tabShowResultDivId);
+        			}
+        			logger.debug(message);
+        			
+        		}
 				catch (Exception e)
 				{
 					sqlResult=doWithException(e);
@@ -166,6 +183,82 @@ public class QueryDefaultImpl  implements Query
         re.setContent(resultContent.toString());
         re.setOnlyShowContent(ajaxRequest);
         return re;
+    }
+    private String executeSelectSqlPageInStatement(String sql,Long pageSize,Long currentPage,DataSourceConfig dataSourceConfig,int sqlIndex,String showResultDivId)
+    {
+    	String re="";
+    	DatabaseDialect databaseDialect = dataSourceConfig.getDatabaseDialect();
+    	DatabseDialectService databaseDialectService = getDatabaseDialectService(databaseDialect);
+    	DataSource datasource2 = dataSourceConfig.getDatasource();
+        JdbcTemplate jdbcTemplate=new JdbcTemplate(datasource2);
+        
+        boolean paging=false;
+        PagingDto pagingInfo=null; 
+        String sqlToExecute=sql;
+        
+    	if(databaseDialectService!=null)
+    	{
+    		String pagingCountSql = getPagingCountSql(sql);
+    		
+            long resultCount = jdbcTemplate.queryForLong(pagingCountSql);
+            if(resultCount>noPageMaxResult)
+            {
+            	//进行分页
+            	pagingInfo = getPagingInfo(resultCount,pageSize,currentPage);
+            	paging=true;
+            	//sqlToExecute=databaseDialectService.getPagingSql(databaseDialect, sql, pagingInfo.getRecordBegin(), pagingInfo.getRecordEnd());
+            }
+    	}
+    	final String sqlToExecuteSql=sqlToExecute;
+    	final Long recordBegin=pagingInfo.getRecordBegin();
+    	final Long recordEnd=pagingInfo.getRecordEnd();
+    	
+        re=jdbcTemplate.execute(new ConnectionCallback<String>(){
+
+			public String doInConnection(Connection con) throws SQLException,
+					DataAccessException {
+				String re="";
+				
+				try
+                {
+					Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+					ResultSet rs = stmt.executeQuery(sqlToExecuteSql);
+                    
+                    if(rs!=null)
+                    {
+                    	//rs.first();
+                    	//rs.relative(recordBegin.intValue()-1);
+                    	rs.absolute(recordBegin.intValue());
+                    	rs.previous();//使用ResultSet.absolute()方法会导致数据集多向前滚动了一条数据，试了ResultSet.absolute(0)会出错，所以在这里再取前一条数据，以得得到正确的结果。
+                    	re=ShowResultSet(rs,recordBegin,recordEnd);
+                    }
+                    
+                } catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+                return re;
+				
+			}});
+    	if(paging)
+    	{
+    		//String sqlIndexDivId="sqlPageDiv"+sqlIndex;
+    		//分页了，则显示分页导航
+    		
+    		String showResultDivIdContainer=getRandomString();
+    		//String pageDataDivIdContainer=getRandomString();
+    		String page1=getPageNavigation(pagingInfo,showResultDivIdContainer);
+    		String pageDatas=showPagingNavigation(sql,dataSourceConfig,pagingInfo);//,pageDataDivIdContainer);
+    		
+    		re="<div id='"+ showResultDivIdContainer +"'>"+pageDatas+page1+re;
+    		re+=page1;
+    		re+="</div>";
+    		
+            
+    		
+    	}
+    	
+    	return re;
     }
     /**
      * 在页面上定义一个javascript函数，以进行分页操作。
@@ -309,6 +402,7 @@ public class QueryDefaultImpl  implements Query
     	}
     	final String sqlToExecuteSql=sqlToExecute;
     	final Long recordBegin=pagingInfo.getRecordBegin();
+    	final Long recordEnd=pagingInfo.getRecordEnd();
     	
         re=jdbcTemplate.execute(new StatementCallback<String>(){
 
@@ -322,7 +416,7 @@ public class QueryDefaultImpl  implements Query
                 rs=stmt.getResultSet();
                 try
                 {
-                    re=ShowResultSet(rs,recordBegin);
+                    re=ShowResultSet(rs,recordBegin,recordEnd);
                 } catch (Exception e)
                 {
                     throw new RuntimeException(e);
@@ -576,7 +670,7 @@ public class QueryDefaultImpl  implements Query
      * @return
      * @throws Exception
      */
-    private String ShowResultSet(final java.sql.ResultSet rs,final Long recordBegin) throws Exception
+    private String ShowResultSet(final java.sql.ResultSet rs,final Long recordBegin,Long recordEnd) throws Exception
     {
         StringBuffer sb=new StringBuffer();
         StringBuffer sbReturnValue=new StringBuffer();
@@ -639,6 +733,9 @@ public class QueryDefaultImpl  implements Query
                     sb.append(" </tr>\n");
                     iResultSetCount++;
                     hasRecord=true;
+                    
+                    if(iResultSetCount>=recordEnd)
+                    	break;
                 }
                 
             }

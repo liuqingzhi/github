@@ -986,7 +986,7 @@ public class QueryDefaultImpl  implements Query
         
         Parameter p1=new Parameter();
         p1.setTitle("SQL脚本");
-        p1.setDescription("在这里输入SQL");
+        p1.setDescription("对SQL的特殊要求：sql中不能有同名的字段，否则会出错，如：select t.created_date,t.* from m_order_info t在执行时会出错，因为这个sql中有同名的两个字段：created_date。");
         p1.setHtmlType(ParameterHtmlType.textArea);
         p1.setCustomName(PARAM_SQL);
         p1.setStyle("width: 1000px; height: 200px;");

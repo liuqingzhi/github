@@ -165,7 +165,7 @@ public class DatabaseIniterService extends SqlMapClientDaoSupport
 		try
 		{
 			InputStream inputStream = sqlFile.getInputStream();
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"utf-8"));
 			re=FileCopyUtils.copyToString(bufferedReader);
 		}
 		catch (IOException e)

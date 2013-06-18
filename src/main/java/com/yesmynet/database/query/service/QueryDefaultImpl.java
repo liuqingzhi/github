@@ -25,6 +25,7 @@ import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.StatementCallback;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 
 
@@ -217,6 +218,7 @@ public class QueryDefaultImpl  implements Query
     	final String sqlToExecuteSql=sqlToExecute;
     	final Long recordBegin=pagingInfo.getRecordBegin();
     	final Long recordEnd=pagingInfo.getRecordEnd();
+    	final StopWatch stopWatch=new StopWatch();
     	
         re=jdbcTemplate.execute(new ConnectionCallback<String>(){
 
@@ -226,16 +228,23 @@ public class QueryDefaultImpl  implements Query
 				
 				try
                 {
+					stopWatch.start("执行查询");
 					Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
 					ResultSet rs = stmt.executeQuery(sqlToExecuteSql);
-                    
+					stopWatch.stop();
+					
                     if(rs!=null)
                     {
+                    	stopWatch.start("ResultSet中滚动以实现分页");
                     	//rs.first();
                     	//rs.relative(recordBegin.intValue()-1);
                     	rs.absolute(recordBegin.intValue());
                     	rs.previous();//使用ResultSet.absolute()方法会导致数据集多向前滚动了一条数据，试了ResultSet.absolute(0)会出错，所以在这里再取前一条数据，以得得到正确的结果。
+                    	stopWatch.stop();
+                    	
+                    	stopWatch.start("输出ResultSet中的数据");
                     	re=ShowResultSet(rs,recordBegin,recordEnd);
+                    	stopWatch.stop();
                     }
                     
                 } catch (Exception e)
@@ -252,11 +261,14 @@ public class QueryDefaultImpl  implements Query
     		
     		String showResultDivIdContainer=getRandomString();
     		//String pageDataDivIdContainer=getRandomString();
-    		String page1=getPageNavigation(pagingInfo,showResultDivIdContainer);
+    		String page1=getPageNavigation(pagingInfo,showResultDivIdContainer,true);
+    		String page2=getPageNavigation(pagingInfo,showResultDivIdContainer,false);
     		String pageDatas=showPagingNavigation(sql,dataSourceConfig,pagingInfo);//,pageDataDivIdContainer);
     		
     		re="<div id='"+ showResultDivIdContainer +"'>"+pageDatas+page1+re;
-    		re+=page1;
+    		String prettyPrint = stopWatch.prettyPrint();
+    		re+="<pre>"+ prettyPrint +"</pre>";
+    		re+=page2;
     		re+="</div>";
     	}
     	
@@ -432,11 +444,12 @@ public class QueryDefaultImpl  implements Query
     		
     		String showResultDivIdContainer=getRandomString();
     		//String pageDataDivIdContainer=getRandomString();
-    		String page1=getPageNavigation(pagingInfo,showResultDivIdContainer);
+    		String page1=getPageNavigation(pagingInfo,showResultDivIdContainer,true);
+    		String page2=getPageNavigation(pagingInfo,showResultDivIdContainer,false);
     		String pageDatas=showPagingNavigation(sql,dataSourceConfig,pagingInfo);//,pageDataDivIdContainer);
     		
     		re="<div id='"+ showResultDivIdContainer +"'>"+pageDatas+page1+re;
-    		re+=page1;
+    		re+=page2;
     		re+="</div>";
     		
             
@@ -483,7 +496,7 @@ public class QueryDefaultImpl  implements Query
      * @param pagingInfo
      * @return
      */
-    private String getPageNavigation(PagingDto pagingInfo,String resultContentDivId)
+    private String getPageNavigation(PagingDto pagingInfo,String resultContentDivId,boolean beforeData)
     {
     	String re="";
     	
@@ -496,7 +509,7 @@ public class QueryDefaultImpl  implements Query
     	{
     		re+=",<span>上一页</span>";
     	}
-    	String goPageByNumInputName="goPageByNum";
+    	String goPageByNumInputName="goPageByNum"+(beforeData?"beforeData":"afterData") ;
     	String goPageNum="$('#"+ resultContentDivId +" #"+ goPageByNumInputName +"').val()";
     	re+=String.format(",到第<input type=\"text\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"3\">页%s",goPageByNumInputName,goPageByNumInputName,pagingInfo.getCurrentPage(),pagingInfo.getPageCount()>0?"<a href=\"javascript:goPage('"+ resultContentDivId +"',"+ goPageNum +")\">确定</a>":"<span>确定</span>" );
     	

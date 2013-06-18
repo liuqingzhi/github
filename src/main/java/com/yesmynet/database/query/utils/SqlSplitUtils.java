@@ -213,16 +213,17 @@ public class SqlSplitUtils {
 				String group = matcher.group();
 				int start = matcher.start();
 				int end = matcher.end();
+				String remainderSqlAfterPairStart=sqlSelf.substring(end);
 				String endStr =getSignPairEnd(group, pairs);
-				int indexOf =sqlSelf.length();
+				int indexOf =remainderSqlAfterPairStart.length();
 				
 				Pattern endPattern = Pattern.compile(endStr);
-				Matcher matcher2 = endPattern.matcher(sqlSelf);
+				Matcher matcher2 = endPattern.matcher(remainderSqlAfterPairStart);
 				if(matcher2.find())
 				{
 					indexOf=matcher2.end();
 				}
-				sqlSelf=sqlSelf.substring(0,start)+sqlSelf.substring(indexOf);
+				sqlSelf=sqlSelf.substring(0,start)+remainderSqlAfterPairStart.substring(indexOf);
 				
 				
 			}
@@ -234,7 +235,9 @@ public class SqlSplitUtils {
 		}
     	
 		sqlSelf=sqlSelf.trim();
-		String substring1 = sqlSelf.substring(0,6);
+		String substring1 ="";
+		if(sqlSelf.length()>6)
+			substring1=sqlSelf.substring(0,6);
 		
 		if("select".equalsIgnoreCase(substring1))
 			re=true;

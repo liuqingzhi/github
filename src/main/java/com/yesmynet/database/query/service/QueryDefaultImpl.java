@@ -238,8 +238,9 @@ public class QueryDefaultImpl  implements Query
                     	stopWatch.start("ResultSet中滚动以实现分页");
                     	//rs.first();
                     	//rs.relative(recordBegin.intValue()-1);
-                    	rs.absolute(recordBegin.intValue());
-                    	rs.previous();//使用ResultSet.absolute()方法会导致数据集多向前滚动了一条数据，试了ResultSet.absolute(0)会出错，所以在这里再取前一条数据，以得得到正确的结果。
+                    	int resultSetPageStart=recordBegin.intValue()-1;//国为在输出ResultSet时行调用了ResultSet的next()方法，所以这里少向前滚动了一条数据
+                    	if(resultSetPageStart>0)
+                    		rs.absolute(resultSetPageStart);
                     	stopWatch.stop();
                     	
                     	stopWatch.start("输出ResultSet中的数据");

@@ -126,28 +126,14 @@ public class QueryDefaultImpl  implements Query
 				{
 					if(sqlDto.isSelect())
 					{
-						sqlResult=executeSelectSql(sqlDto.getSql(),pageSize,currentPage,dataSourceConfig,i,tabShowResultDivId);
+						//sqlResult=executeSelectSql(sqlDto.getSql(),pageSize,currentPage,dataSourceConfig,i,tabShowResultDivId);
+						sqlResult=executeSelectSqlPageInStatement(sqlDto.getSql(),pageSize,currentPage,dataSourceConfig,i,tabShowResultDivId);
 					}
 					else
 					{
 						sqlResult=executeUpdataSql(sqlDto.getSql(),dataSourceConfig);
 					}
 				}
-        		catch (BadSqlGrammarException e)
-        		{
-        			Throwable cause = e.getCause();
-        			String message = cause.getMessage();
-        			String patternStr="ORA-00918: column ambiguously defined";
-        			Pattern pattern=Pattern.compile(patternStr);
-        			Matcher matcher = pattern.matcher(message);
-        			
-        			if(matcher.find())
-        			{
-        				sqlResult=executeSelectSqlPageInStatement(sqlDto.getSql(),pageSize,currentPage,dataSourceConfig,i,tabShowResultDivId);
-        			}
-        			logger.debug(message);
-        			
-        		}
 				catch (Exception e)
 				{
 					sqlResult=doWithException(e);
@@ -187,6 +173,22 @@ public class QueryDefaultImpl  implements Query
         re.setOnlyShowContent(ajaxRequest);
         return re;
     }
+    /**
+     * 在statement中实现分页，这可能会有性能问题。
+     * 我试了在sql中实现分页，会查出一些奇怪的结果集，如下的sql:SELECT b.* FROM (
+		SELECT a.*,ROWNUM num FROM (select * From m_trading_transaction_balance t1 
+		join m_trading_goods t2 on t1.seller_trading_id=t2.id
+		order by t1.id) a where ROWNUM  <=  20 ) b WHERE num  >=  1
+		字段名都是很奇怪的。
+     * @param sql
+     * @param pageSize
+     * @param currentPage
+     * @param dataSourceConfig
+     * @param sqlIndex
+     * @param showResultDivId
+     * @return
+     */
+    
     private String executeSelectSqlPageInStatement(String sql,Long pageSize,Long currentPage,DataSourceConfig dataSourceConfig,int sqlIndex,String showResultDivId)
     {
     	String re="";
@@ -256,9 +258,6 @@ public class QueryDefaultImpl  implements Query
     		re="<div id='"+ showResultDivIdContainer +"'>"+pageDatas+page1+re;
     		re+=page1;
     		re+="</div>";
-    		
-            
-    		
     	}
     	
     	return re;

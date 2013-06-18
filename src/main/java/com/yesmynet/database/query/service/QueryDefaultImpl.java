@@ -282,6 +282,10 @@ public class QueryDefaultImpl  implements Query
     {
     	StringBuilder re=new StringBuilder();
     	
+    	re.append("<div id=\"ajaxtip\" title=\"正在执行查询\" style=\"display:none;\">\n");
+    	re.append("	<img id='ajaxtipImage' src='' style='vertical-align:middle; width:25px; height:25px; margin-right:5px; display:inline;' />正在执行查询，请稍候...\n");  
+    	re.append("</div>\n");
+    	
     	re.append("<script type=\"text/javascript\">\n");
     	re.append("		function goPage(toReplaceContentDivId,targetPageNum)\n");
     	re.append("		{\n");
@@ -294,11 +298,17 @@ public class QueryDefaultImpl  implements Query
     	re.append("				  url: url,\n");
     	re.append("				  dataType:\"html\",\n");
     	re.append("				  data: { \"SystemQueryExecute\":\"\",\"ajaxRequest\":\"1\",\"SystemDataSourceId\": datasourceId, \"sqlCode\": sql,\"currentPage\":targetPageNum },\n");
-    	re.append("				  ajaxStart:function() {\n");
-    	re.append("				  	$( \"#loading\" ).show();\n");
+    	re.append("				  beforeSend:function() {\n");
+    	re.append("				  	var ajaxtipImage =$( \"#ajaxtipImage\" );\n");
+    	re.append("				  	var ajaxtip=$( \"#ajaxtip\" );\n");
+    	re.append("				  	ajaxtipImage.attr('src',requestContext+'/image/loading.gif');\n");
+    	re.append("				  	ajaxtip.css('position','absolute');\n");
+    	re.append("				  	ajaxtip.css('top', Math.max(0, (($(window).height() - ajaxtip.outerHeight()) / 2) + $(window).scrollTop()) + 'px');\n");
+    	re.append("				  	ajaxtip.css('left', Math.max(0, (($(window).width() - ajaxtip.outerWidth()) / 2) + $(window).scrollLeft()) + 'px');\n");
+    	re.append("				  	ajaxtip.show();\n");
     	re.append("				  	 },\n");
     	re.append("				  success: function(data, textStatus, jqXHR) {\n");
-    	re.append("				  	$( \"#loading\" ).hide();\n");
+    	re.append("				  	$( \"#ajaxtip\" ).hide();\n");
     	re.append("					  $(\"#\"+toReplaceContentDivId).html(data);\n");
     	re.append("				  }\n");
     	re.append("				});\n");

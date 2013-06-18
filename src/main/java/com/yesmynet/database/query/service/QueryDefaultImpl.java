@@ -216,8 +216,8 @@ public class QueryDefaultImpl  implements Query
             }
     	}
     	final String sqlToExecuteSql=sqlToExecute;
-    	final Long recordBegin=pagingInfo.getRecordBegin();
-    	final Long recordEnd=pagingInfo.getRecordEnd();
+    	final Long recordBegin=(pagingInfo==null?1:pagingInfo.getRecordBegin());
+    	final Long recordEnd=(pagingInfo==null?-1:pagingInfo.getRecordEnd());
     	final StopWatch stopWatch=new StopWatch();
     	
         re=jdbcTemplate.execute(new ConnectionCallback<String>(){
@@ -494,16 +494,17 @@ public class QueryDefaultImpl  implements Query
     private String showPagingNavigation(String sql,DataSourceConfig dataSourceConfig,PagingDto pagingInfo)//,String sqlIndexDivId)
     {
     	StringBuilder re=new StringBuilder();
-    	
-    	//re.append("<div id='").append(sqlIndexDivId).append("' style='display:none;'>");
-    	re.append("<textarea id='"+ PARAM_SQL +"' style='display:none;'>").append(sql).append("</textarea>\n");//使用textarea以避免sql中的特殊符号导致html出错
-    	re.append("<input type='hidden' id='"+ SystemParameterName.DataSourceId.getParamerName() +"' value='"+ dataSourceConfig.getId() +"'>\n");
-    	re.append("<input type='hidden' id='"+ PARAM_PAGE_SIZE +"' value='"+ pagingInfo.getPageSize() +"'>\n");
-    	re.append("<input type='hidden' id='"+ PARAM_CURRENT_PAGE +"' value='"+ pagingInfo.getCurrentPage() +"'>\n");
-    	re.append("<input type='hidden' id='"+ PARAM_REQUEST_BY_AJAX +"' value=''>\n");
-    	
-    	//re.append("</div>");
-    	
+    	if(pagingInfo!=null)
+    	{
+	    	//re.append("<div id='").append(sqlIndexDivId).append("' style='display:none;'>");
+	    	re.append("<textarea id='"+ PARAM_SQL +"' style='display:none;'>").append(sql).append("</textarea>\n");//使用textarea以避免sql中的特殊符号导致html出错
+	    	re.append("<input type='hidden' id='"+ SystemParameterName.DataSourceId.getParamerName() +"' value='"+ dataSourceConfig.getId() +"'>\n");
+	    	re.append("<input type='hidden' id='"+ PARAM_PAGE_SIZE +"' value='"+ pagingInfo.getPageSize() +"'>\n");
+	    	re.append("<input type='hidden' id='"+ PARAM_CURRENT_PAGE +"' value='"+ pagingInfo.getCurrentPage() +"'>\n");
+	    	re.append("<input type='hidden' id='"+ PARAM_REQUEST_BY_AJAX +"' value=''>\n");
+	    	
+	    	//re.append("</div>");
+    	}
     	return re.toString();
     }
     /**
@@ -514,28 +515,31 @@ public class QueryDefaultImpl  implements Query
     private String getPageNavigation(PagingDto pagingInfo,String resultContentDivId,boolean beforeData)
     {
     	String re="";
+    	if(pagingInfo!=null)
+    	{
+    		re=String.format("当前第%s页/共%s页，共%s条记录",pagingInfo.getCurrentPage(),pagingInfo.getPageCount(),pagingInfo.getRecordCount());
+        	if(pagingInfo.getCurrentPage()>1)
+        	{
+        		re+=",<a href=\"javascript:goPage('"+ resultContentDivId +"','"+ (pagingInfo.getCurrentPage()-1) +"')\">上一页</a>";
+        	}
+        	else
+        	{
+        		re+=",<span>上一页</span>";
+        	}
+        	String goPageByNumInputName="goPageByNum"+(beforeData?"beforeData":"afterData") ;
+        	String goPageNum="$('#"+ resultContentDivId +" #"+ goPageByNumInputName +"').val()";
+        	re+=String.format(",到第<input type=\"text\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"3\">页%s",goPageByNumInputName,goPageByNumInputName,pagingInfo.getCurrentPage(),pagingInfo.getPageCount()>0?"<a href=\"javascript:goPage('"+ resultContentDivId +"',"+ goPageNum +")\">确定</a>":"<span>确定</span>" );
+        	
+        	if(pagingInfo.getCurrentPage()<pagingInfo.getPageCount())
+        	{
+        		re+=",<a href=\"javascript:goPage('"+ resultContentDivId +"','"+ (pagingInfo.getCurrentPage()+1) +"')\">下一页</a>";
+        	}
+        	else
+        	{
+        		re+=",<span>下一页</span>";
+        	}
+    	}
     	
-    	re=String.format("当前第%s页/共%s页，共%s条记录",pagingInfo.getCurrentPage(),pagingInfo.getPageCount(),pagingInfo.getRecordCount());
-    	if(pagingInfo.getCurrentPage()>1)
-    	{
-    		re+=",<a href=\"javascript:goPage('"+ resultContentDivId +"','"+ (pagingInfo.getCurrentPage()-1) +"')\">上一页</a>";
-    	}
-    	else
-    	{
-    		re+=",<span>上一页</span>";
-    	}
-    	String goPageByNumInputName="goPageByNum"+(beforeData?"beforeData":"afterData") ;
-    	String goPageNum="$('#"+ resultContentDivId +" #"+ goPageByNumInputName +"').val()";
-    	re+=String.format(",到第<input type=\"text\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"3\">页%s",goPageByNumInputName,goPageByNumInputName,pagingInfo.getCurrentPage(),pagingInfo.getPageCount()>0?"<a href=\"javascript:goPage('"+ resultContentDivId +"',"+ goPageNum +")\">确定</a>":"<span>确定</span>" );
-    	
-    	if(pagingInfo.getCurrentPage()<pagingInfo.getPageCount())
-    	{
-    		re+=",<a href=\"javascript:goPage('"+ resultContentDivId +"','"+ (pagingInfo.getCurrentPage()+1) +"')\">下一页</a>";
-    	}
-    	else
-    	{
-    		re+=",<span>下一页</span>";
-    	}
     	return re;
 		
     }
@@ -653,6 +657,8 @@ public class QueryDefaultImpl  implements Query
     /**
      * 显示结果
      * @param rs
+     * @param recordBegin 输出rs中的数据时，用于显示当前输出的第1条数据是整个ResultSet中第几条数据。
+     * @param recordEnd 输出rs中到哪条数据，1表示第1条记录，2表示第二条记录，依此类推，特殊的，用负数表示输出全部记录。
      * @return
      * @throws Exception
      */

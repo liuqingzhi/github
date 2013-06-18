@@ -108,7 +108,7 @@ public class QueryRenderServiceImpl implements QueryRenderService
 		
 		re+=MessageFormat.format(tempalte, value,parameterName,style);
 		
-		if(!ParameterHtmlType.inputHidden.equals(parameterHtmlType))
+		if(!ParameterHtmlType.inputHidden.equals(parameterHtmlType) && StringUtils.hasText(parameter.getDescription()))
 		{
 			re+="<br>"+parameter.getDescription();
 			re+="<br>";

@@ -294,7 +294,11 @@ public class QueryDefaultImpl  implements Query
     	re.append("				  url: url,\n");
     	re.append("				  dataType:\"html\",\n");
     	re.append("				  data: { \"SystemQueryExecute\":\"\",\"ajaxRequest\":\"1\",\"SystemDataSourceId\": datasourceId, \"sqlCode\": sql,\"currentPage\":targetPageNum },\n");
+    	re.append("				  ajaxStart:function() {\n");
+    	re.append("				  	$( \"#loading\" ).show();\n");
+    	re.append("				  	 },\n");
     	re.append("				  success: function(data, textStatus, jqXHR) {\n");
+    	re.append("				  	$( \"#loading\" ).hide();\n");
     	re.append("					  $(\"#\"+toReplaceContentDivId).html(data);\n");
     	re.append("				  }\n");
     	re.append("				});\n");

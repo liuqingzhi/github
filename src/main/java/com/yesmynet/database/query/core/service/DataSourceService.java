@@ -5,6 +5,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import com.yesmynet.database.query.dto.DataSourceConfig;
+import com.yesmynet.database.query.dto.User;
 
 public interface DataSourceService
 {
@@ -13,11 +14,11 @@ public interface DataSourceService
 	 * @param id
 	 * @return
 	 */
-	public DataSourceConfig getDataSourceById(String id);
+	public DataSourceConfig getDataSourceById(String id,User user);
 	/**
 	 * 得到系统中配置的所有数据源
 	 * @return
 	 */
-	public List<DataSourceConfig> getDataSources();
+	public List<DataSourceConfig> getDataSources(User user);
 	
 }

@@ -1,5 +1,7 @@
 package com.yesmynet.database.query.dto;
 
+import java.util.List;
+
 import javax.sql.DataSource;
 /**
  * 表示系统中配置的所有数据源
@@ -24,6 +26,11 @@ public class DataSourceConfig
 	 * 配置的数据源
 	 */
 	private DataSource datasource;
+	/**
+	 * 允许使用本数据源配置的角色列表，如果本属性为空表示允许所有用户使用，否则只允许
+	 * 至少具有本属性指定的其中之一角色的用户使用。
+	 */
+	private List<Role> permitRoles;
 	public String getId()
 	{
 		return id;
@@ -55,6 +62,14 @@ public class DataSourceConfig
 	public void setDatasource(DataSource datasource)
 	{
 		this.datasource = datasource;
+	}
+	public List<Role> getPermitRoles()
+	{
+		return permitRoles;
+	}
+	public void setPermitRoles(List<Role> permitRoles)
+	{
+		this.permitRoles = permitRoles;
 	}
 	
 }

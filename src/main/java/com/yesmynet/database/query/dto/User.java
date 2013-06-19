@@ -1,6 +1,7 @@
 package com.yesmynet.database.query.dto;
 
 import java.util.Date;
+import java.util.List;
 
 import com.yesmynet.database.query.core.dto.BaseDto;
 /**
@@ -26,6 +27,10 @@ public class User extends BaseDto
      * 创建时间
      */
     private Date createDate;
+    /**
+     * 该用户具有的所有角色
+     */
+    private List<Role> roles;
     public String getLoginName()
     {
         return loginName;
@@ -58,4 +63,12 @@ public class User extends BaseDto
     {
         this.createDate = createDate;
     }
+	public List<Role> getRoles()
+	{
+		return roles;
+	}
+	public void setRoles(List<Role> roles)
+	{
+		this.roles = roles;
+	}
 }

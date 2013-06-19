@@ -228,6 +228,7 @@ public class QueryDefaultImpl  implements Query
 				
 				try
                 {
+					
 					stopWatch.start("执行查询");
 					Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
 					ResultSet rs = stmt.executeQuery(sqlToExecuteSql);
@@ -350,13 +351,36 @@ public class QueryDefaultImpl  implements Query
     	re="<div id='"+ tabResultDivId +"'>"+ content +"</div>";
     	return re;
     }
-    private String executeUpdataSql(String sql,DataSourceConfig dataSourceConfig)
+    private String executeUpdataSql(final String sql,DataSourceConfig dataSourceConfig)
     {
     	String re="";
     	DataSource datasource2 = dataSourceConfig.getDatasource();
         JdbcTemplate jdbcTemplate=new JdbcTemplate(datasource2);
         
-        int update = jdbcTemplate.update(sql);
+        int update =0;
+        update=jdbcTemplate.update(sql);//为了能自动提交事务,所以直接操作Connection
+       /* update=jdbcTemplate.execute(new ConnectionCallback<Integer>(){
+
+			public Integer doInConnection(Connection con) throws SQLException,
+					DataAccessException {
+				Integer re=0;
+				
+				try
+                {
+					con.setAutoCommit(true);
+					Statement statement = con.createStatement();
+					
+					re=statement.executeUpdate(sql);
+					con.commit();
+					
+                } catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+                return re;
+				
+			}});*/
+        
         re=String.format("更新了%s条记录",update);
     	return re;
     }
@@ -726,7 +750,7 @@ public class QueryDefaultImpl  implements Query
                     iResultSetCount++;
                     hasRecord=true;
                     
-                    if(iResultSetCount>=recordEnd)
+                    if(recordEnd>0 && iResultSetCount>=recordEnd)
                     	break;
                 }
                 

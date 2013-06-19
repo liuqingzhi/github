@@ -2,6 +2,8 @@ package com.yesmynet.database.query.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -12,6 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
@@ -32,7 +38,9 @@ import com.yesmynet.database.query.core.service.QueryDefinitionService;
 import com.yesmynet.database.query.core.service.QueryExecutorService;
 import com.yesmynet.database.query.core.service.QueryRenderService;
 import com.yesmynet.database.query.dto.DataSourceConfig;
+import com.yesmynet.database.query.dto.Role;
 import com.yesmynet.database.query.dto.SystemParameterName;
+import com.yesmynet.database.query.dto.User;
 
 /**
  * 显示出查询的界面，并执行查询
@@ -80,8 +88,8 @@ public class QueryController
         String dataSourceId=request.getParameter(SystemParameterName.DataSourceId.getParamerName());//使用的数据源
 
 	    boolean executeQuery=(queryExecute==null)?false:true;//是否要执行查询
-	    
-	    List<DataSourceConfig> allDataSources = dataSourceService.getDataSources();
+	    User currentUser = getCurrentUser();
+	    List<DataSourceConfig> allDataSources = dataSourceService.getDataSources(currentUser);
 	    
 	    QueryDefinition queryParameters = queryDefinitionService.getQueryParameters(queryId);
         setHttpParameterValue(queryParameters,request);
@@ -95,7 +103,11 @@ public class QueryController
             {
                 /*要执行查询*/
                 Query queryInstance = queryDefinitionService.getQueryInstance(queryId);
-                DataSourceConfig dataSourceById = dataSourceService.getDataSourceById(dataSourceId);
+                DataSourceConfig dataSourceById = dataSourceService.getDataSourceById(dataSourceId,currentUser);
+                if(dataSourceById==null)
+                {
+                	throw new RuntimeException("您无权操作该数据源");
+                }
                 queryResult = queryExecutorService.executeQuery(queryInstance, queryParameters,dataSourceById);
             }
             
@@ -129,6 +141,36 @@ public class QueryController
 		
         return viewName;
     }
+	
+	private User getCurrentUser()
+	{
+		User re=new User();
+		SecurityContext securityContext = SecurityContextHolder.getContext();
+		Authentication authentication = securityContext.getAuthentication();
+		String userName=((org.springframework.security.core.userdetails.User)authentication.getPrincipal()).getUsername();
+		Collection<? extends GrantedAuthority> authorities = securityContext.getAuthentication().getAuthorities();
+		
+		
+		
+		List<Role> roles=new ArrayList<Role>();
+		if(!CollectionUtils.isEmpty(authorities))
+		{
+			for(GrantedAuthority g:authorities)
+			{
+				String authority = g.getAuthority();
+				Role role=new Role();
+				role.setRoleCode(authority);
+				
+				roles.add(role);
+			}
+			
+		}
+		re.setLoginName(userName);
+		re.setRoles(roles);
+		
+		
+		return re;
+	}
 	/**
 	 * 编辑一个查询
 	 * @param request

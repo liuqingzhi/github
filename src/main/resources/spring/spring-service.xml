@@ -57,6 +57,13 @@
                     <property name="databaseDialect" value="Derby"></property>
                     <property name="datasource" ref="dataSource">
                     </property>
+                    <property name="permitRoles">
+                    	<list>
+							<bean class="com.yesmynet.database.query.dto.Role">
+								<property name="roleCode" value="role_admin"></property>
+							</bean>
+						</list>	
+                    </property>
 				</bean>
 				
 			</list>

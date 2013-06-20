@@ -104,7 +104,19 @@ public class QueryRenderServiceImpl implements QueryRenderService
 		{
 			re=parameter.getTitle()+"：";	
 		}
-		if(!StringUtils.hasText(value)) value="";
+		if(!StringUtils.hasText(value) || (parameter.getEraseValue()!=null && parameter.getEraseValue() ))
+		{
+			value="";
+		}
+		else
+		{
+			if(!ParameterHtmlType.textArea.equals(parameterHtmlType))
+			{
+				value=value.replaceAll("\n", "&#10;");//这个会导致一个换行变成二个换行，还不清楚是什么原因
+				value=value.replaceAll("\"", "&#034;");
+				value=value.replaceAll("'", "&#039;");
+			}
+		}
 		
 		re+=MessageFormat.format(tempalte, value,parameterName,style);
 		

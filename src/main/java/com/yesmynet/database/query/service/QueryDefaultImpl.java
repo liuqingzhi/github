@@ -88,7 +88,10 @@ public class QueryDefaultImpl  implements Query
      * 是否为ajax请求，只要本参数有值（不管值是什么）就是ajax请求
      */
     private final String PARAM_REQUEST_BY_AJAX="ajaxRequest";
-    
+    /**
+     * 用户选中的Sql，因为可以在整个输入的SQL中选中一部分，然后只执行选中的这部分SQL
+     */
+    private final String PARAM_SELECTED_SQL="selectedSql";
     
     public QueryReult doInQuery(DataSourceConfig dataSourceConfig,
             QueryDefinition queryDefinition)
@@ -103,8 +106,10 @@ public class QueryDefaultImpl  implements Query
         final Map<String,Parameter> parameterMap=new HashMap<String,Parameter>();
         for (Parameter i : parameters) parameterMap.put(i.getCustomName(),i);
         StringBuilder resultContent=new StringBuilder();
-        final String sql=parameterMap.get(PARAM_SQL).getValue();
+        String sql=parameterMap.get(PARAM_SQL).getValue();
+        String selectedSql=parameterMap.get(PARAM_SELECTED_SQL).getValue();
         final Boolean ajaxRequest=StringUtils.hasText(parameterMap.get(PARAM_REQUEST_BY_AJAX).getValue());
+        sql=StringUtils.hasText(selectedSql)?selectedSql:sql;//如果选中了sql，则只执行选中的部分
         List<SqlDto> sqlList=SqlSplitUtils.splitSql(sql);
         if(!CollectionUtils.isEmpty(sqlList))
         {
@@ -167,6 +172,8 @@ public class QueryDefaultImpl  implements Query
         	
         	String pageNavigationScriptFunction = getPageNavigationScriptFunction();
         	resultContent.append(pageNavigationScriptFunction);
+        	resultContent.append(getExecuteSelectedSqlScript());
+        	
         }
         
         
@@ -318,6 +325,49 @@ public class QueryDefaultImpl  implements Query
     	re.append("	</script>\n");
     	
     	return re.toString();
+    }
+    /**
+     * 得到为了执行用户选中的文本的功能的相关javascript
+     * @return
+     */
+    private String getExecuteSelectedSqlScript()
+    {
+    	String re="";
+    	
+    	re=""+
+    			"<script type=\"text/javascript\">\n"+
+    			"	var getSelected = function(){\n"+
+    			"	    var t = '';\n"+
+    			"	    if(window.getSelection) {\n"+
+    			"	        t = window.getSelection();\n"+
+    			"	    } else if(document.getSelection) {\n"+
+    			"	        t = document.getSelection();\n"+
+    			"	    } else if(document.selection) {\n"+
+    			"	        t = document.selection.createRange().text;\n"+
+    			"	    }\n"+
+    			"	    return t;\n"+
+    			"	}\n"+
+    			"	\n"+
+    			"	$(\"[name='sqlCode']\").select(function(eventObject) {\n"+
+    			"		var selectedText=getSelected().toString();\n"+
+    			"		var selectedSqlInput=$(\"input[name='selectedSql']\") \n"+
+    			"		selectedText=selectedText.replace(/^\\s+|\\s+$/g,'');\n"+
+    			"		\n"+
+    			"		if(selectedText.length>1)\n"+
+    			"		{\n"+
+    			"			selectedSqlInput.val(selectedText);	\n"+
+    			"		}\n"+
+    			"		else\n"+
+    			"		{\n"+
+    			"			selectedSqlInput.val('');\n"+
+    			"		}\n"+
+    			"		\n"+
+    			"		\n"+
+    			"	});\n"+
+    			"</script>\n"+
+    			"";
+    	return re;
+    	
     }
     /**
      * 得到tab选项卡的头，用来点击这个头可以显示tab页的内容。
@@ -919,11 +969,19 @@ public class QueryDefaultImpl  implements Query
         p4.setCustomName(PARAM_REQUEST_BY_AJAX);
         p4.setStyle("");
         
+        Parameter p5=new Parameter();
+        p5.setTitle("选中的sql");
+        p5.setDescription("");
+        p5.setHtmlType(ParameterHtmlType.inputHidden);
+        p5.setCustomName(PARAM_SELECTED_SQL);
+        p5.setStyle("");
+        p5.setEraseValue(true);
         
         parameters.add(p1);
         parameters.add(p2);
         parameters.add(p3);
         parameters.add(p4);
+        parameters.add(p5);
         
         return queryDefinition;
 	    

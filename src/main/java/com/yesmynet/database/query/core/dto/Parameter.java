@@ -57,6 +57,10 @@ public class Parameter extends BaseDto
 	 */
 	private String value;
 	/**
+	 * 是否擦除提交的值，如果为true 表示擦除，即不回显
+	 */
+	private Boolean eraseValue;
+	/**
 	 * 得到参数的html页面上显示的名称
 	 * @param parameterDefine
 	 * @return
@@ -137,6 +141,14 @@ public class Parameter extends BaseDto
 	public void setValue(String value)
 	{
 		this.value = value;
+	}
+	public Boolean getEraseValue()
+	{
+		return eraseValue;
+	}
+	public void setEraseValue(Boolean eraseValue)
+	{
+		this.eraseValue = eraseValue;
 	}
 	
 }

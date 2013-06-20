@@ -3,9 +3,16 @@
 <html>
 	
 	<@dbQueryFuntion.head></@dbQueryFuntion.head>
+	<script type="text/javascript">
+		function submitQueryForm()
+		{
+			$("#queryForm").ajaxSubmit();
+		}
+		shortcut("X",submitQueryForm);//定义快捷键
+	</script>
 	<body>
 		<div class="divBlock">
-			<form action="" method="POST">
+			<form id="queryForm" action="" method="POST">
 				<input type="hidden" name="SystemQueryExecute" value="">
 				${queryHtml}
 			</form>

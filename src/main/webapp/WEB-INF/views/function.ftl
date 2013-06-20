@@ -13,6 +13,7 @@
 		
   		<script src="${requestContext.contextPath}/js/jquery-1.10.1.js"></script>
   		<script src="${requestContext.contextPath}/js/jquery-ui.js"></script>
+  		<script src="${requestContext.contextPath}/js/shortcut.js"></script>
   		<script type="text/javascript">
   			var requestContext="${requestContext.contextPath}"; 
   		</script>

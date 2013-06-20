@@ -943,7 +943,7 @@ public class QueryDefaultImpl  implements Query
         
         Parameter p1=new Parameter();
         p1.setTitle("SQL脚本");
-        p1.setDescription("可以使用F8执行SQL");//参数的描述，可以显示在界面的
+        p1.setDescription("功能提示：1、可以使用F8执行SQL；2、可以选中一部分SQL执行，然后执行。");//参数的描述，可以显示在界面的
         p1.setHtmlType(ParameterHtmlType.textArea);
         p1.setCustomName(PARAM_SQL);
         p1.setStyle("width: 1000px; height: 200px;");

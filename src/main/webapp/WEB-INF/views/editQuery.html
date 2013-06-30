@@ -26,7 +26,8 @@
 	    			<#list query.parameters as param>
 	    			<tr>
 	    				<td>
-	    					<input type="checkbox" name="parameters[${param_index}].id" value="${param.id}">
+	    					<input type="checkbox" name="parametersToDelete" value="${param.id}">
+	    					<input type="hidden" name="parameters[${param_index}].id" value="${param.id}">
 	    				</td>
 	    				<td>
 	    					<input type="text" name="parameters[${param_index}].customName" value="${(param.customName)!""}">
@@ -77,7 +78,8 @@
 				<#noparse>
 					<tr>
 	    				<td>
-	    					<input type="checkbox" name="parameters[${param_index}].id" value="">
+							<input type="checkbox" name="parametersToDelete" value="-1">
+	    					<input type="hidden" name="parameters[${param_index}].id" value="-1">
 	    				</td>
 	    				<td>
 	    					<input type="text" name="parameters[${param_index}].customName" value="">
@@ -106,15 +108,16 @@
 	</script>
 	<script type="text/javascript">
 		$(document).ready(function() {
+			var rowCount = $('#parameterListTable tr').length;
+			
 			$("#parameterAddButton").click(function()
 			{
-				var rowCount = $('#parameterListTable tr').length;
-				rowCount=rowCount-2;
+				var newRowIndex=rowCount-2;
 				
-				var parameterRow=$( "#parameterInsertTemplate" ).tmpl({param_index:rowCount});
+				var parameterRow=$( "#parameterInsertTemplate" ).tmpl({param_index:newRowIndex});
 				
-				
-				$('#parameterListTable tr:last').after(parameterRow);
+				$('#parameterListTable tr:last').before(parameterRow);
+				rowCount=rowCount+1;
 			});
 			
 			$("#parameterDeleteButton").click(function()

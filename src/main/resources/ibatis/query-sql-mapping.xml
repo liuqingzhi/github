@@ -61,10 +61,10 @@
 	</insert>
 	
 	<!--删除查询中定义的参数-->
-	<delete id="deleteQueryParameter" parameterClass="java.util.Map">
+	<delete id="deleteQueryParameterByNotIn" parameterClass="java.util.Map">
 		delete from m_sys_query_parameter where query_id=#queryId:INTEGER# 
 		<isNotEmpty property="toDeleteParameterIds">
-			and id in
+			and id not in
 			<iterate property="toDeleteParameterIds" open="(" close=")" conjunction=",">  
 			     #toDeleteParameterIds[]:INTEGER#  
 			</iterate>

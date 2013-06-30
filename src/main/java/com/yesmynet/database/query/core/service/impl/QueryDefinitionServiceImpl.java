@@ -129,10 +129,11 @@ public class QueryDefinitionServiceImpl extends SqlMapClientDaoSupport implement
         {
             for(Parameter p:parameters)
             {
-                toDeleteParamIds.add(p.getId());
+            	if(StringUtils.hasText(p.getId()))
+            		toDeleteParamIds.add(p.getId());
             }
         }
-        this.getSqlMapClientTemplate().update("deleteQueryParameter", paramMap);
+        this.getSqlMapClientTemplate().update("deleteQueryParameterByNotIn", paramMap);
         
         if(!CollectionUtils.isEmpty(parameters))
         {

@@ -51,6 +51,13 @@ import com.yesmynet.database.query.dto.User;
 public class QueryController
 {
 	Logger logger=LoggerFactory.getLogger(this.getClass());
+	/**
+	 * 表示查询参数的ID是空的值 ，因为在客户端添加的查询参数时，使用spring mvc数据绑定时，绑定到List
+	 * 中直接使用客户端提交的数据的序号，如：当提交parameters[1５].htmlType参数时，会导致 生成一个有16个
+	 * 元素的List,List前15个对象没有设置属性，为了表示只有第16个元素是有效的数据，我在客户端提交时，把ID设置成
+	 * 本属性的值，提交上来再检查id的值，如果等于本属性的值，则再把ID赋为null.
+	 */
+	public static final String QueryParameterNullId="-1";
     /**
      * 数据源配置的service
      */
@@ -208,7 +215,11 @@ public class QueryController
     {
         String queryId="";
         QueryDefinition queryParameters=null;
+        List<Parameter> parameters = queryDefinition.getParameters();
         
+        
+        trimParameterList(parameters);
+        replaceParameterNullIdParameterList(parameters);
         queryDefinitionService.save(queryDefinition);
         
         queryId=queryDefinition.getId();
@@ -216,6 +227,45 @@ public class QueryController
         model.addAttribute("query", queryParameters);
         return "redirect:/editQuery.do?id="+queryId;
     }
+	/**
+	 * 把查询参数中空的数据删除。
+	 * 因为从客户端提交上来的查询参数列表是一个List，spring mvc在绑定数据时，直接根据提交的数据的序号生成List，如：
+	 * 对于客户端提交的参数：parameters[0].htmlType，parameters[15].htmlType，会直接生成一个
+	 * List，包含16个元素，事实上，此时只提交了2个查询参数，中间的1到14的元素应该删除。
+	 * @param parameters
+	 */
+	private void trimParameterList(List<Parameter> parameters)
+	{
+		if(!CollectionUtils.isEmpty(parameters))
+		{
+			List<Parameter> toRemoveParameters=new ArrayList<Parameter>();
+			for(Parameter p:parameters)
+			{
+				if(!StringUtils.hasText(p.getId()))
+				{
+					toRemoveParameters.add(p);
+				}
+			}
+			parameters.removeAll(toRemoveParameters);
+		}
+	}
+	/**
+	 * 把查询参数中ID应该为空的设置为null
+	 * @param parameters
+	 */
+	private void replaceParameterNullIdParameterList(List<Parameter> parameters)
+	{
+		if(!CollectionUtils.isEmpty(parameters))
+		{
+			for(Parameter p:parameters)
+			{
+				if(QueryParameterNullId.equals(p.getId()))
+				{
+					p.setId(null);
+				}
+			}
+		}
+	}
 	private String printException(Exception e)
 	{
 	    String re="";

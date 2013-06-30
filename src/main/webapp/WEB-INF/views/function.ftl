@@ -17,7 +17,7 @@
   		<script type="text/javascript">
   			var requestContext="${requestContext.contextPath}"; 
   		</script>
-	   
+	   <#nested>
 	 </head>
 	 
 </#macro>

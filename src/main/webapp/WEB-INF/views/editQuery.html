@@ -1,7 +1,9 @@
 <#import "function.ftl" as dbQueryFuntion>
 <!DOCTYPE HTML>
 <html>
-	<@dbQueryFuntion.head></@dbQueryFuntion.head>
+	<@dbQueryFuntion.head>
+	<script src="${requestContext.contextPath}/js/jquery.tmpl.js"></script>
+	</@dbQueryFuntion.head>
 
 	<body>
 		<div class="divBlock">
@@ -16,6 +18,7 @@
 						<th>ID</th>
 						<th>参数名称</th>
 						<th>参数标题</th>
+						<th>css style</th>
 						<th>参数描述</th>
 						<th>参数html类型</th>
 					</tr>
@@ -30,10 +33,14 @@
 	    				</td>
 						<td>
 							<input type="text" name="parameters[${param_index}].title" value="${(param.title)!""}">
-						</td>	    				
+						</td>
+						<td>
+	    					<input type="text" name="parameters[${param_index}].style" value="${(param.style)!""}">
+	    				</td>	    				
 	    				<td>
-	    					<textarea rows="3" cols="100" name="parameters[${param_index}].description">${(param.description)!""}</textarea>
+	    					<input type="text" name="parameters[${param_index}].description" value="${(param.description)!""}">
 	    				</td>
+	    				
 	    				<td>
 	    					<select name="parameters[${param_index}].htmlType">
 						        <#list allHtmlTypes as htmlType1>
@@ -66,6 +73,37 @@
 		</div>
 	</body>
 	
+	<script id="parameterInsertTemplate" type="text/x-jquery-tmpl">
+				<#noparse>
+					<tr>
+	    				<td>
+	    					<input type="checkbox" name="parameters[${param_index}].id" value="">
+	    				</td>
+	    				<td>
+	    					<input type="text" name="parameters[${param_index}].customName" value="">
+	    				</td>
+						<td>
+							<input type="text" name="parameters[${param_index}].title" value="">
+						</td>
+						<td>
+	    					<input type="text" name="parameters[${param_index}].style" value="">
+	    				</td>	    				
+	    				<td>
+	    					<input type="text" name="parameters[${param_index}].description" value="">
+	    				</td>
+	    				
+	    				<td>
+	    					<select name="parameters[${param_index}].htmlType">
+					</#noparse>
+						        <#list allHtmlTypes as htmlType1>
+						        <option value="${htmlType1}" <#if (param.htmlType)?exists && param.htmlType==htmlType1>selected</#if>>${htmlType1.title}</option>
+						        </#list>
+					<#noparse>
+						    </select>
+	    				</td>
+	    			</tr>
+				</#noparse>
+	</script>
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$("#parameterAddButton").click(function()
@@ -73,36 +111,16 @@
 				var rowCount = $('#parameterListTable tr').length;
 				rowCount=rowCount-2;
 				
+				var parameterRow=$( "#parameterInsertTemplate" ).tmpl({param_index:rowCount});
 				
-				$('#parameterListTable tr:last').after('<tr>'+
-					'	<td>'+
-					'		<input type="checkbox" name="parameters['+ rowCount +'].id" value="">'+
-					'	</td>'+
-	    			'	<td>'+
-    				'	<input type="text" name="parameters['+ rowCount +'].customName" value="">'+
-    				'</td>'+
-					'<td>'+
-					'	<input type="text" name="parameters['+ rowCount +'].title" value="">'+
-					'</td>'+
-    				'<td>'+
-    				'	<textarea rows="3" cols="100" name="parameters['+ rowCount +'].description"></textarea>'+
-    				'</td>'+
-    				'<td>'+
-    				'	<select name="parameters['+ rowCount +'].htmlType">'+
-					'	        <#list allHtmlTypes as htmlType1>'+
-					'	        <option value="${htmlType1}">${htmlType1.title}</option>'+
-					'	        </#list>'+
-					'	    </select>'+
-    				'</td>'+
-    			'</tr>');
+				
+				$('#parameterListTable tr:last').after(parameterRow);
 			});
 			
 			$("#parameterDeleteButton").click(function()
 			{
-				$('#parameterListTable input[type=checkbox]:checked')
-				.each(function () {
-				       var sThisVal = (this.checked ? $(this).val() : "");
-				  });
+				$('#parameterListTable input[type=checkbox]:checked').parents("tr").remove();
+				
 			});
 			
 		});

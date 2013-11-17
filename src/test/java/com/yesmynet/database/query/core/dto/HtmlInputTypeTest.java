@@ -8,26 +8,26 @@ import junit.framework.TestCase;
 public class HtmlInputTypeTest extends TestCase {
 	public void testInput()
 	{
-		List<HtmlInputType> a=getHtmlInput();
-		for(HtmlInputType input:a)
+		List<Parameter> a=getHtmlInput();
+		for(Parameter input:a)
 		{
 			System.out.println(input.toHtml()+"\n");
 		}
 		
 			
 	}
-	private List<HtmlInputType> getHtmlInput()
+	private List<Parameter> getHtmlInput()
 	{
-		List<HtmlInputType> a=new ArrayList<HtmlInputType>();
-		HtmlTextInput text=new HtmlTextInput(HtmlInputType.InputTypeEnum.InputText);
+		List<Parameter> a=new ArrayList<Parameter>();
+		Parameter text=new Parameter();
 		
+		text.setHtmlType(ParameterHtmlType.InputText);
 		text.setCustomName("inputNameaaa");
 		text.setId("1");
-		text.setOptionValues("默认值1");
+		text.setValue(new String[]{"输入值"});
 		
-		HtmlSelectInput select=new HtmlSelectInput(HtmlInputType.InputTypeEnum.Select);
+		Parameter select=new Parameter();
 		List<SelectOption> options=new ArrayList<SelectOption>();
-		List<SelectOption> selectedOptions=new ArrayList<SelectOption>();
 		
 		SelectOption o1=new SelectOption();
 		o1.setValue("o1");
@@ -50,29 +50,23 @@ public class HtmlInputTypeTest extends TestCase {
 		options.add(o3);
 		options.add(o4);
 		
-		SelectOption s1=new SelectOption();
-		s1.setValue("o2");
-		SelectOption s2=new SelectOption();
-		s2.setValue("s2");
-		
-		
-		selectedOptions.add(s1);
-		selectedOptions.add(s2);
-		
 		select.setId("2");
+		select.setHtmlType(ParameterHtmlType.Select);
 		select.setOptionValues(options);
-		select.setValue(selectedOptions);;
+		select.setValue(new String[]{"o2","s2"});
 		
 		
-		HtmlSelectInput checkbox=new HtmlSelectInput(HtmlInputType.InputTypeEnum.Checkbox);
+		Parameter checkbox=new Parameter();
 		checkbox.setId("2");
+		checkbox.setHtmlType(ParameterHtmlType.Checkbox);
 		checkbox.setOptionValues(options);
-		checkbox.setValue(selectedOptions);;
+		checkbox.setValue(new String[]{"o2","s2"});
 		
-		HtmlSelectInput radio=new HtmlSelectInput(HtmlInputType.InputTypeEnum.Radio);
+		Parameter radio=new Parameter();
 		radio.setId("2");
+		radio.setHtmlType(ParameterHtmlType.Radio);
 		radio.setOptionValues(options);
-		radio.setValue(selectedOptions);;
+		radio.setValue(new String[]{"o2","s2"});;
 		
 		
 		a.add(text);

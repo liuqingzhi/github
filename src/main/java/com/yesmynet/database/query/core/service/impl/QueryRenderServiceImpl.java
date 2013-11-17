@@ -94,38 +94,7 @@ public class QueryRenderServiceImpl implements QueryRenderService
 	protected String getParameterHtml(Parameter parameter)
 	{
 		String re="";
-		ParameterHtmlType parameterHtmlType = parameter.getHtmlType();
-		String tempalte=parameterHtmlType.getHtmlTemplate();
-		String parameterName=parameter.getParameterName();
-		String style = parameter.getStyle();
-		String value=parameter.getValue();
-		
-		if(!ParameterHtmlType.inputHidden.equals(parameterHtmlType))
-		{
-			re=parameter.getTitle()+"：";	
-		}
-		if(!StringUtils.hasText(value) || (parameter.getEraseValue()!=null && parameter.getEraseValue() ))
-		{
-			value="";
-		}
-		else
-		{
-			if(!ParameterHtmlType.textArea.equals(parameterHtmlType))
-			{
-				value=value.replaceAll("\n", "&#10;");//这个会导致一个换行变成二个换行，还不清楚是什么原因
-				value=value.replaceAll("\"", "&#034;");
-				value=value.replaceAll("'", "&#039;");
-			}
-		}
-		
-		re+=MessageFormat.format(tempalte, value,parameterName,style);
-		
-		if(!ParameterHtmlType.inputHidden.equals(parameterHtmlType) && StringUtils.hasText(parameter.getDescription()))
-		{
-			re+="<br>"+parameter.getDescription();
-			re+="<br>";
-		}
-		
+		re=parameter.toHtml();
 		return re;
 	}
 }

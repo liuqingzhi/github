@@ -21,6 +21,7 @@
         <result property="htmlType"  column="html_Type"/>
         <result property="customName"  column="custom_Name"/>
         <result property="style"  column="style"/>
+        <result property="styleClass"  column="style_class"/>
     </resultMap>
 
 	<!--得到查询-->
@@ -74,14 +75,14 @@
     <!--更新查询定义的参数-->
     <update id="updateQueryParameter" parameterClass="com.yesmynet.database.query.core.dto.Parameter" >
 		UPDATE m_sys_query_parameter set 
-		title=#title#,description=#description#,html_Type=#htmlType#,custom_Name=#customName#,STYLE=#style#,LAST_UPDATE_TIME=CURRENT_TIMESTAMP
+		title=#title#,description=#description#,html_Type=#htmlType#,custom_Name=#customName#,STYLE=#style#,style_class=#styleClass#,LAST_UPDATE_TIME=CURRENT_TIMESTAMP
 		where id=#id:INTEGER#
 	</update>
     <!--插入查询定义的参数-->
     <update id="insertQueryParameter" parameterClass="com.yesmynet.database.query.core.dto.Parameter" >
-		insert into m_sys_query_parameter (query_id,title,description,html_Type,custom_Name,STYLE,LAST_UPDATE_TIME)
+		insert into m_sys_query_parameter (query_id,title,description,html_Type,custom_Name,STYLE,style_class,LAST_UPDATE_TIME)
 		values
-		(#queryDefinition.id:INTEGER#,#title#,#description#,#htmlType#,#customName#,#style#,CURRENT_TIMESTAMP) 
+		(#queryDefinition.id:INTEGER#,#title#,#description#,#htmlType#,#customName#,#style#,#styleClass:VARCHAR#,CURRENT_TIMESTAMP) 
 	</update>
 	
 	

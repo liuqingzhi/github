@@ -19,6 +19,7 @@
 						<th>参数名称</th>
 						<th>参数标题</th>
 						<th>css style</th>
+						<th>css class</th>
 						<th>参数描述</th>
 						<th>参数html类型</th>
 					</tr>
@@ -37,6 +38,9 @@
 						</td>
 						<td>
 	    					<input type="text" name="parameters[${param_index}].style" value="${(param.style)!""}">
+	    				</td>
+	    				<td>
+	    					<input type="text" name="parameters[${param_index}].styleClass" value="${(param.styleClass)!""}">
 	    				</td>	    				
 	    				<td>
 	    					<input type="text" name="parameters[${param_index}].description" value="${(param.description)!""}">
@@ -89,6 +93,9 @@
 						</td>
 						<td>
 	    					<input type="text" name="parameters[${param_index}].style" value="">
+	    				</td>
+						<td>
+	    					<input type="text" name="parameters[${param_index}].styleClass" value="">
 	    				</td>	    				
 	    				<td>
 	    					<input type="text" name="parameters[${param_index}].description" value="">

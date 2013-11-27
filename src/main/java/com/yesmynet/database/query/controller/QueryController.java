@@ -287,9 +287,9 @@ public class QueryController
 	        {
 	            for(Parameter p:parameters)
 	            {
-	                String parameterName = p.getParameterName();
+	                String parameterName = p.getParameterInput().getParameterName();
 	                String[] parameterValue = request.getParameterValues(parameterName);
-	                p.setValue(parameterValue);
+	                p.getParameterInput().setValue(parameterValue);
 	            }
 	        }    
 	    }

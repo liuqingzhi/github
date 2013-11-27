@@ -31,25 +31,25 @@
 	    					<input type="hidden" name="parameters[${param_index}].id" value="${param.id}">
 	    				</td>
 	    				<td>
-	    					<input type="text" name="parameters[${param_index}].customName" value="${(param.customName)!""}">
+	    					<input type="text" name="parameters[${param_index}].parameterInput.customName" value="${(param.parameterInput.customName)!""}">
 	    				</td>
 						<td>
-							<input type="text" name="parameters[${param_index}].title" value="${(param.title)!""}">
+							<input type="text" name="parameters[${param_index}].parameterInput.title" value="${(param.parameterInput.title)!""}">
 						</td>
 						<td>
-	    					<input type="text" name="parameters[${param_index}].style" value="${(param.style)!""}">
+	    					<input type="text" name="parameters[${param_index}].parameterInput.style" value="${(param.parameterInput.style)!""}">
 	    				</td>
 	    				<td>
-	    					<input type="text" name="parameters[${param_index}].styleClass" value="${(param.styleClass)!""}">
+	    					<input type="text" name="parameters[${param_index}].parameterInput.styleClass" value="${(param.parameterInput.styleClass)!""}">
 	    				</td>	    				
 	    				<td>
-	    					<input type="text" name="parameters[${param_index}].description" value="${(param.description)!""}">
+	    					<input type="text" name="parameters[${param_index}].parameterInput.description" value="${(param.parameterInput.description)!""}">
 	    				</td>
 	    				
 	    				<td>
-	    					<select name="parameters[${param_index}].htmlType">
+	    					<select name="parameters[${param_index}].parameterInput.htmlType">
 						        <#list allHtmlTypes as htmlType1>
-						        <option value="${htmlType1}" <#if (param.htmlType)?exists && param.htmlType==htmlType1>selected</#if>>${htmlType1.title}</option>
+						        <option value="${htmlType1}" <#if (param.parameterInput.htmlType)?exists && param.parameterInput.htmlType==htmlType1>selected</#if>>${htmlType1.title}</option>
 						        </#list>
 						    </select>
 	    				</td>
@@ -86,23 +86,23 @@
 	    					<input type="hidden" name="parameters[${param_index}].id" value="-1">
 	    				</td>
 	    				<td>
-	    					<input type="text" name="parameters[${param_index}].customName" value="">
+	    					<input type="text" name="parameters[${param_index}].parameterInput.customName" value="">
 	    				</td>
 						<td>
-							<input type="text" name="parameters[${param_index}].title" value="">
+							<input type="text" name="parameters[${param_index}].parameterInput.title" value="">
 						</td>
 						<td>
-	    					<input type="text" name="parameters[${param_index}].style" value="">
+	    					<input type="text" name="parameters[${param_index}].parameterInput.style" value="">
 	    				</td>
 						<td>
-	    					<input type="text" name="parameters[${param_index}].styleClass" value="">
+	    					<input type="text" name="parameters[${param_index}].parameterInput.styleClass" value="">
 	    				</td>	    				
 	    				<td>
-	    					<input type="text" name="parameters[${param_index}].description" value="">
+	    					<input type="text" name="parameters[${param_index}].parameterInput.description" value="">
 	    				</td>
 	    				
 	    				<td>
-	    					<select name="parameters[${param_index}].htmlType">
+	    					<select name="parameters[${param_index}].parameterInput.htmlType">
 					</#noparse>
 						        <#list allHtmlTypes as htmlType1>
 						        <option value="${htmlType1}" <#if (param.htmlType)?exists && param.htmlType==htmlType1>selected</#if>>${htmlType1.title}</option>

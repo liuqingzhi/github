@@ -30,10 +30,12 @@ import org.springframework.util.StringUtils;
 
 
 
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.yesmynet.database.query.core.dto.Parameter;
 import com.yesmynet.database.query.core.dto.ParameterHtmlType;
+import com.yesmynet.database.query.core.dto.ParameterInput;
 import com.yesmynet.database.query.core.dto.Query;
 import com.yesmynet.database.query.core.dto.QueryDefinition;
 import com.yesmynet.database.query.core.dto.QueryReult;
@@ -104,11 +106,11 @@ public class QueryDefaultImpl  implements Query
         QueryReult re=new QueryReult();
         List<Parameter> parameters = queryDefinition.getParameters();
         final Map<String,Parameter> parameterMap=new HashMap<String,Parameter>();
-        for (Parameter i : parameters) parameterMap.put(i.getCustomName(),i);
+        for (Parameter i : parameters) parameterMap.put(i.getParameterInput().getCustomName(),i);
         StringBuilder resultContent=new StringBuilder();
-        String sql=parameterMap.get(PARAM_SQL).getValue()[0];
-        String selectedSql=parameterMap.get(PARAM_SELECTED_SQL).getValue()[0];
-        final Boolean ajaxRequest=StringUtils.hasText(parameterMap.get(PARAM_REQUEST_BY_AJAX).getValue()[0]);
+        String sql=parameterMap.get(PARAM_SQL).getParameterInput().getValue()[0];
+        String selectedSql=parameterMap.get(PARAM_SELECTED_SQL).getParameterInput().getValue()[0];
+        final Boolean ajaxRequest=StringUtils.hasText(parameterMap.get(PARAM_REQUEST_BY_AJAX).getParameterInput().getValue()[0]);
         sql=StringUtils.hasText(selectedSql)?selectedSql:sql;//如果选中了sql，则只执行选中的部分
         List<SqlDto> sqlList=SqlSplitUtils.splitSql(sql);
         if(!CollectionUtils.isEmpty(sqlList))
@@ -458,7 +460,7 @@ public class QueryDefaultImpl  implements Query
     	Parameter parameter = parameterMap.get(parameterName);
 		if(parameter!=null)
 		{
-			String pageSizeStr = parameter.getValue()[0];
+			String pageSizeStr = parameter.getParameterInput().getValue()[0];
 			try
 			{
 				re=Long.parseLong(pageSizeStr);
@@ -942,40 +944,50 @@ public class QueryDefaultImpl  implements Query
         queryDefinition.setShowExecuteButton(true);
         
         Parameter p1=new Parameter();
-        p1.setTitle("SQL脚本");
-        p1.setDescription("功能提示：1、可以使用F8执行SQL；2、可以选中一部分SQL执行，然后执行。");//参数的描述，可以显示在界面的
-        p1.setHtmlType(ParameterHtmlType.TextArea);
-        p1.setCustomName(PARAM_SQL);
-        p1.setStyle("width: 1000px; height: 200px;");
+        ParameterInput p1Input=new ParameterInput();
+        p1.setParameterInput(p1Input);
+        p1.getParameterInput().setTitle("SQL脚本");
+        p1.getParameterInput().setDescription("功能提示：1、可以使用F8执行SQL；2、可以选中一部分SQL执行，然后执行。");//参数的描述，可以显示在界面的
+        p1.getParameterInput().setHtmlType(ParameterHtmlType.TextArea);
+        p1.getParameterInput().setCustomName(PARAM_SQL);
+        p1.getParameterInput().setStyle("width: 1000px; height: 200px;");
         
         Parameter p2=new Parameter();
-        p2.setTitle("每页显示的记录数");
-        p2.setDescription("");
-        p2.setHtmlType(ParameterHtmlType.InputHidden);
-        p2.setCustomName(PARAM_PAGE_SIZE);
-        p2.setStyle("");
+        ParameterInput p2Input=new ParameterInput();
+        p2.setParameterInput(p2Input);
+        p2.getParameterInput().setTitle("每页显示的记录数");
+        p2.getParameterInput().setDescription("");
+        p2.getParameterInput().setHtmlType(ParameterHtmlType.InputHidden);
+        p2.getParameterInput().setCustomName(PARAM_PAGE_SIZE);
+        p2.getParameterInput().setStyle("");
         
         Parameter p3=new Parameter();
-        p3.setTitle("当前页码");
-        p3.setDescription("");
-        p3.setHtmlType(ParameterHtmlType.InputHidden);
-        p3.setCustomName(PARAM_CURRENT_PAGE);
-        p3.setStyle("");
+        ParameterInput p3Input=new ParameterInput();
+        p3.setParameterInput(p3Input);
+        p3.getParameterInput().setTitle("当前页码");
+        p3.getParameterInput().setDescription("");
+        p3.getParameterInput().setHtmlType(ParameterHtmlType.InputHidden);
+        p3.getParameterInput().setCustomName(PARAM_CURRENT_PAGE);
+        p3.getParameterInput().setStyle("");
         
         Parameter p4=new Parameter();
-        p4.setTitle("是否为ajax请求");
-        p4.setDescription("");
-        p4.setHtmlType(ParameterHtmlType.InputHidden);
-        p4.setCustomName(PARAM_REQUEST_BY_AJAX);
-        p4.setStyle("");
+        ParameterInput p4Input=new ParameterInput();
+        p4.setParameterInput(p4Input);
+        p4.getParameterInput().setTitle("是否为ajax请求");
+        p4.getParameterInput().setDescription("");
+        p4.getParameterInput().setHtmlType(ParameterHtmlType.InputHidden);
+        p4.getParameterInput().setCustomName(PARAM_REQUEST_BY_AJAX);
+        p4.getParameterInput().setStyle("");
         
         Parameter p5=new Parameter();
-        p5.setTitle("选中的sql");
-        p5.setDescription("");
-        p5.setHtmlType(ParameterHtmlType.InputHidden);
-        p5.setCustomName(PARAM_SELECTED_SQL);
-        p5.setStyle("");
-        p5.setEraseValue(true);
+        ParameterInput p5Input=new ParameterInput();
+        p5.setParameterInput(p5Input);
+        p5.getParameterInput().setTitle("选中的sql");
+        p5.getParameterInput().setDescription("");
+        p5.getParameterInput().setHtmlType(ParameterHtmlType.InputHidden);
+        p5.getParameterInput().setCustomName(PARAM_SELECTED_SQL);
+        p5.getParameterInput().setStyle("");
+        p5.getParameterInput().setEraseValue(true);
         
         parameters.add(p1);
         parameters.add(p2);

@@ -79,10 +79,10 @@ public class QueryRenderServiceImpl implements QueryRenderService
 	 */
 	protected String getParaName(Parameter parameter)
 	{
-		String re=parameter.getCustomName();
+		String re=parameter.getParameterInput().getCustomName();
 		if(!StringUtils.hasText(re))
 		{
-			re=parameter.getDefaltNamePrifix()+""+parameter.getId();
+			re=parameter.getParameterInput().getDefaltNamePrifix()+""+parameter.getId();
 		}
 		return re;
 	}
@@ -94,7 +94,7 @@ public class QueryRenderServiceImpl implements QueryRenderService
 	protected String getParameterHtml(Parameter parameter)
 	{
 		String re="";
-		re=parameter.toHtml();
+		re=parameter.getParameterInput().toHtml();
 		return re;
 	}
 }

@@ -16,12 +16,13 @@
 	<resultMap id="queryParameterResult" class="com.yesmynet.database.query.core.dto.Parameter">
         <result property="queryDefinition.id"  column="query_id"/>
         <result property="id"  column="id"/>
-        <result property="title"  column="title"/>
-        <result property="description"  column="description"/>
-        <result property="htmlType"  column="html_Type"/>
-        <result property="customName"  column="custom_Name"/>
-        <result property="style"  column="style"/>
-        <result property="styleClass"  column="style_class"/>
+        <result property="parameterInput.id"  column="id"/>
+        <result property="parameterInput.title"  column="title"/>
+        <result property="parameterInput.description"  column="description"/>
+        <result property="parameterInput.htmlType"  column="html_Type"/>
+        <result property="parameterInput.customName"  column="custom_Name"/>
+        <result property="parameterInput.style"  column="style"/>
+        <result property="parameterInput.styleClass"  column="style_class"/>
     </resultMap>
 
 	<!--得到查询-->
@@ -53,7 +54,7 @@
     <insert id="insertQueryDefinition" parameterClass="com.yesmynet.database.query.core.dto.QueryDefinition" >
 		insert into m_sys_query (name,description,after_Parameter_Html,show_Execute_Button,system_init_create,system_default,finished,java_code,last_update_time)
 		values
-		(#name#,#description#,#afterParameterHtml:VARCHAR#,#showExecuteButton#,0,0,#finished#,#javaCode#,CURRENT_TIMESTAMP)
+		(#name:VARCHAR#,#description:VARCHAR#,#afterParameterHtml:VARCHAR#,#showExecuteButton#,0,0,#finished#,#javaCode:CLOB#,CURRENT_TIMESTAMP)
 		
 		<selectKey type="post" keyProperty="id" resultClass="java.lang.String" >
     		values IDENTITY_VAL_LOCAL()
@@ -75,14 +76,14 @@
     <!--更新查询定义的参数-->
     <update id="updateQueryParameter" parameterClass="com.yesmynet.database.query.core.dto.Parameter" >
 		UPDATE m_sys_query_parameter set 
-		title=#title#,description=#description#,html_Type=#htmlType#,custom_Name=#customName#,STYLE=#style#,style_class=#styleClass#,LAST_UPDATE_TIME=CURRENT_TIMESTAMP
+		title=#parameterInput.title#,description=#parameterInput.description#,html_Type=#parameterInput.htmlType#,custom_Name=#parameterInput.customName#,STYLE=#parameterInput.style#,style_class=#parameterInput.styleClass#,LAST_UPDATE_TIME=CURRENT_TIMESTAMP
 		where id=#id:INTEGER#
 	</update>
     <!--插入查询定义的参数-->
     <update id="insertQueryParameter" parameterClass="com.yesmynet.database.query.core.dto.Parameter" >
 		insert into m_sys_query_parameter (query_id,title,description,html_Type,custom_Name,STYLE,style_class,LAST_UPDATE_TIME)
 		values
-		(#queryDefinition.id:INTEGER#,#title#,#description#,#htmlType#,#customName#,#style#,#styleClass:VARCHAR#,CURRENT_TIMESTAMP) 
+		(#queryDefinition.id:INTEGER#,#parameterInput.title#,#parameterInput.description#,#parameterInput.htmlType#,#parameterInput.customName#,#parameterInput.style#,#parameterInput.styleClass:VARCHAR#,CURRENT_TIMESTAMP) 
 	</update>
 	
 	

@@ -12,5 +12,5 @@ public interface ParameterValidator
      * @return
      * @author 刘庆志
      */
-    public ValidateResult valid(Parameter parameter); 
+    public ValidateResult valid(ParameterInput parameterInput); 
 }

@@ -1,7 +1,10 @@
 package com.yesmynet.database.query.core.dto;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.util.CollectionUtils;
 
 /**
  * 参数验证器定义器。
@@ -35,17 +38,27 @@ public abstract class ParameterValidatorDefine
     public String showHtml(Map<String,String> validateRuleDatas)
     {
         List<ParameterInput> inputs = getInputs();
+        StringBuilder sb=new StringBuilder();
+        if(CollectionUtils.isEmpty(inputs))
+        {
+        	for(ParameterInput p:inputs)
+        	{
+        		sb.append(p.toHtml());
+        	}
+        }
         
+        return sb.toString();
     }
     /**
      * 保存验证器的设置。
      * @param validateRuleDatas 用户提交的所有的参数
-     * @return
+     * @return 保存是否成功 
      * @author 刘庆志
      */
     public boolean save(Map<String,String> validateRuleDatas)
     {
-        
+        boolean re=false;
+        return re;
     }
     
 }

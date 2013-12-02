@@ -1,10 +1,12 @@
-package com.yesmynet.database.query.core.dto;
+package com.yesmynet.database.query.core.service;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.util.CollectionUtils;
+
+import com.yesmynet.database.query.core.dto.ParameterInput;
 
 /**
  * 参数验证器定义器。

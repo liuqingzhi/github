@@ -1,12 +1,18 @@
 package com.yesmynet.database.query.core.service;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
+import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
 import org.springframework.util.CollectionUtils;
 
 import com.yesmynet.database.query.core.dto.ParameterInput;
+import com.yesmynet.database.query.core.dto.ParameterValidatorRecordDto;
+import com.yesmynet.database.query.core.dto.QueryDefinition;
 
 /**
  * 参数验证器定义器。
@@ -16,8 +22,13 @@ import com.yesmynet.database.query.core.dto.ParameterInput;
  * @author 刘庆志
  *
  */
-public abstract class ParameterValidatorDefine
+public abstract class ParameterValidatorDefine extends SqlMapClientDaoSupport 
 {
+	/**
+	 * 得到验证器的Key
+	 * @return
+	 */
+	protected abstract String getValidatorType();
     /**
      * 得到验证器的名称。如：非空验证器、邮件地址验证器。
      * @return
@@ -30,15 +41,36 @@ public abstract class ParameterValidatorDefine
      * @author 刘庆志
      */
     protected abstract List<ParameterInput> getInputs();
-    
+    /**
+     * 保存数据前先验证数据
+     * @param validateRuleDatas 所有要保存的数据
+     * @return true表示验证通过，可以保存；false表示验证不通过，不保存。
+     */
+    protected abstract boolean validParameterBeforeSave(Map<String,String> validateRuleDatas);
+    /**
+     * 得到参数使用本验证器的数据
+     * @param parameterId
+     * @return
+     */
+    protected ParameterValidatorRecordDto getValidateDatas(String parameterId)
+    {
+    	ParameterValidatorRecordDto re=null;
+    	Map<String,Object> param=new HashMap<String,Object>();
+    	param.put("parameterId", parameterId);
+    	param.put("validatorType", getValidatorType());
+    	
+    	re=(ParameterValidatorRecordDto)this.getSqlMapClientTemplate().queryForObject("getParameterValidator", param);
+    	return re;
+    }
     /**
      * 以html展示这个验证器的设置界面。
      * @param validateRuleDatas 所有的参数
      * @return
      * @author 刘庆志
      */
-    public String showHtml(Map<String,String> validateRuleDatas)
+    public String showHtml(String parameterId)
     {
+    	Map<String,String> validateDatas;
         List<ParameterInput> inputs = getInputs();
         StringBuilder sb=new StringBuilder();
         if(CollectionUtils.isEmpty(inputs))
@@ -57,9 +89,36 @@ public abstract class ParameterValidatorDefine
      * @return 保存是否成功 
      * @author 刘庆志
      */
-    public boolean save(Map<String,String> validateRuleDatas)
+    public boolean save(Map<String,String> validateRuleDatas,String parameterId)
     {
-        boolean re=false;
+        boolean re=validParameterBeforeSave(validateRuleDatas);
+        if(re)
+        {
+        	Map<String,Object> param=new HashMap<String,Object>();
+        	param.put("parameterId", parameterId);
+        	param.put("validatorType", getValidatorType());
+        	
+        	this.getSqlMapClientTemplate().delete("deleteParameterValidatorData", param);
+        	this.getSqlMapClientTemplate().delete("deleteParameterValidator", param);
+        	
+        	ParameterValidatorRecordDto parameterValidatorRecordDto=new ParameterValidatorRecordDto();
+        	parameterValidatorRecordDto.setParameterId(parameterId);
+        	parameterValidatorRecordDto.setValidatorType(getValidatorType());
+        	this.getSqlMapClientTemplate().insert("saveParameterValidator", param);
+        	Set<Entry<String,String>> entrySet = validateRuleDatas.entrySet();
+        	for(Entry<String,String> entry:entrySet)
+        	{
+        		String key = entry.getKey();
+        		String value = entry.getValue();
+        		
+        		Map<String,Object> param1=new HashMap<String,Object>();
+            	param1.put("validatorId", parameterValidatorRecordDto.getId());
+            	param1.put("dataKey", key);
+            	param1.put("dataValue", value);
+            	
+        		this.getSqlMapClientTemplate().insert("saveParameterValidatorData", param1);
+        	}
+        }
         return re;
     }
     

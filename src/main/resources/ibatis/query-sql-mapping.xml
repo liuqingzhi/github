@@ -24,7 +24,19 @@
         <result property="parameterInput.style"  column="style"/>
         <result property="parameterInput.styleClass"  column="style_class"/>
     </resultMap>
-
+	<!--得到参数使用的验证器-->
+	<resultMap id="parameterValidatorRecordDtoResult" class="com.yesmynet.database.query.core.dto.ParameterValidatorRecordDto">
+        <result property="id"  column="id"/>
+        <result property="parameterId"  column="parameter_id"/>
+        <result property="validatorType"  column="validator_type"/>
+        <result property="validatorDatas" column="id" select="getParameterValidatorData" />
+    </resultMap>
+    <!--得到参数使用的验证器的数据-->
+    <resultMap id=ParameterValidatorRecordDataResult" class="java.util.HashMap">  
+		<result property="key" column="data_key"/>  
+		<result property="value" column="data_value"/>  
+	</resultMap>  
+    
 	<!--得到查询-->
     <select id="getQueryDefinitionById" resultMap="queryResult" parameterClass="java.lang.String">
        	select * From m_sys_query 
@@ -86,6 +98,39 @@
 		(#queryDefinition.id:INTEGER#,#parameterInput.title#,#parameterInput.description#,#parameterInput.htmlType#,#parameterInput.customName#,#parameterInput.style#,#parameterInput.styleClass:VARCHAR#,CURRENT_TIMESTAMP) 
 	</update>
 	
-	
-	
+	<!--删除参数使用的一个验证器的相关数据-->
+	<delete id="deleteParameterValidatorData" parameterClass="java.util.Map">
+		delete from m_sys_parameter_validator_data 
+		where validator_id=(select id from m_sys_parameter_validator where parameter_id=#parameterId:INTEGER# and validator_type=#validatorType#)
+	</delete>
+	<!--删除参数要使用的验证器-->
+	<delete id="deleteParameterValidator" parameterClass="java.util.Map">
+		delete from m_sys_parameter_validator where parameter_id=#parameterId:INTEGER# and validator_type=#validatorType#
+	</delete>
+	<!--新插入一条参数使用的验证器-->
+    <insert id="saveParameterValidator" parameterClass="com.yesmynet.database.query.core.dto.ParameterValidatorRecordDto">
+		insert into m_sys_parameter_validator (parameter_id,validator_type)
+		values
+		(#parameterId:INTEGER#,#validatorType:VARCHAR#)
+		
+		<selectKey type="post" keyProperty="id" resultClass="java.lang.String" >
+    		values IDENTITY_VAL_LOCAL()
+  		</selectKey>
+	</insert>
+	<!--新插入参数验证器的数据-->
+    <insert id="saveParameterValidatorData" parameterClass="java.util.Map">
+		insert into m_sys_parameter_validator_data (validator_id,data_key,data_value)
+		values
+		(#validatorId:INTEGER#,#dataKey:VARCHAR#,#dataValue:VARCHAR#)
+	</insert>
+	<!--得到参数使用的验证器-->
+    <select id="getParameterValidator" resultMap="parameterValidatorRecordDtoResult" parameterClass="java.util.Map">
+       	select * From m_sys_parameter_validator 
+		where parameter_id=#parameterId:INTEGER# and validator_type=#validatorType:VARCHAR#
+    </select>
+	<!--得到参数使用的验证器的数据-->
+    <select id="getParameterValidatorData" resultMap="ParameterValidatorRecordDataResult"　parameterClass="java.lang.String">
+       	select t1.* From m_sys_parameter_validator_data t1
+		where t1.validator_id=#value#
+    </select>
 </sqlMap>

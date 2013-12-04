@@ -15,6 +15,7 @@ import org.springframework.util.StringUtils;
 import com.yesmynet.database.query.core.dto.Parameter;
 import com.yesmynet.database.query.core.dto.Query;
 import com.yesmynet.database.query.core.dto.QueryDefinition;
+import com.yesmynet.database.query.core.service.ParameterValidatorDefine;
 import com.yesmynet.database.query.core.service.QueryDefinitionService;
 import com.yesmynet.database.query.service.QueryDefaultImpl;
 
@@ -24,6 +25,10 @@ public class QueryDefinitionServiceImpl extends SqlMapClientDaoSupport implement
 	 * 默认查询的实例类，当没有指定query的ID时会使用本默认查询
 	 */
 	private QueryDefaultImpl defaultQueryInstance;
+	/**
+	 * 所有参数验证器的定义
+	 */
+	private List<ParameterValidatorDefine> parameterValidatorDefineList;
 	public QueryDefinition getQueryParameters(String queryId)
 	{
 		QueryDefinition re=null;
@@ -82,6 +87,11 @@ public class QueryDefinitionServiceImpl extends SqlMapClientDaoSupport implement
 	        return defaultQueryInstance; 
 	    }
 		
+	}
+	@Override
+	public List<ParameterValidatorDefine> getAllValidatorDefines() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	/**
 	 * 对空的Id进行处理，以保证返回的一定不是空的，如果原来的id不是空的，则直接返回，否则返回一个随机的字符串
@@ -152,5 +162,13 @@ public class QueryDefinitionServiceImpl extends SqlMapClientDaoSupport implement
 	public void setDefaultQueryInstance(QueryDefaultImpl defaultQueryInstance) {
 		this.defaultQueryInstance = defaultQueryInstance;
 	}
+	public List<ParameterValidatorDefine> getParameterValidatorDefineList() {
+		return parameterValidatorDefineList;
+	}
+	public void setParameterValidatorDefineList(
+			List<ParameterValidatorDefine> parameterValidatorDefineList) {
+		this.parameterValidatorDefineList = parameterValidatorDefineList;
+	}
+	
 
 }

@@ -1,5 +1,7 @@
 package com.yesmynet.database.query.core.service;
 
+import java.util.List;
+
 import com.yesmynet.database.query.core.dto.Query;
 import com.yesmynet.database.query.core.dto.QueryDefinition;
 
@@ -29,5 +31,9 @@ public interface QueryDefinitionService
 	 * @return
 	 */
 	public Query getQueryInstance(String id);
-	
+	/**
+	 * 得到所有参数验证定义的对象
+	 * @return
+	 */
+	public List<ParameterValidatorDefine> getAllValidatorDefines();
 }

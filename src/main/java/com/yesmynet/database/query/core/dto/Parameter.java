@@ -30,6 +30,10 @@ public class Parameter extends BaseDto
 	 * 输入控件
 	 */
 	private ParameterInput parameterInput;
+	/**
+	 * 参数验证器配置
+	 */
+	private List<ParameterValidatorRecordDto> parameterValidatorRecordDtos;
 	public QueryDefinition getQueryDefinition()
 	{
 		return queryDefinition;
@@ -46,5 +50,12 @@ public class Parameter extends BaseDto
     {
         this.parameterInput = parameterInput;
     }
+	public List<ParameterValidatorRecordDto> getParameterValidatorRecordDtos() {
+		return parameterValidatorRecordDtos;
+	}
+	public void setParameterValidatorRecordDtos(
+			List<ParameterValidatorRecordDto> parameterValidatorRecordDtos) {
+		this.parameterValidatorRecordDtos = parameterValidatorRecordDtos;
+	}
 	
 }

@@ -28,19 +28,19 @@ public abstract class ParameterValidatorDefine extends SqlMapClientDaoSupport
 	 * 得到验证器的Key
 	 * @return
 	 */
-	protected abstract String getValidatorType();
+	public abstract String getValidatorType();
     /**
      * 得到验证器的名称。如：非空验证器、邮件地址验证器。
      * @return
      * @author 刘庆志
      */
-    protected abstract String getName();
+	public abstract String getName();
     /**
      * 得到设置验证器的所有输入框，所有输入框的名称作为{@link #showHtml(Map)}和{@link #save(Map)}中的map中的key.
      * @return
      * @author 刘庆志
      */
-    protected abstract List<ParameterInput> getInputs();
+	public abstract List<ParameterInput> getInputs();
     /**
      * 保存数据前先验证数据
      * @param validateRuleDatas 所有要保存的数据

@@ -90,8 +90,7 @@ public class QueryDefinitionServiceImpl extends SqlMapClientDaoSupport implement
 	}
 	@Override
 	public List<ParameterValidatorDefine> getAllValidatorDefines() {
-		// TODO Auto-generated method stub
-		return null;
+		return parameterValidatorDefineList;
 	}
 	/**
 	 * 对空的Id进行处理，以保证返回的一定不是空的，如果原来的id不是空的，则直接返回，否则返回一个随机的字符串

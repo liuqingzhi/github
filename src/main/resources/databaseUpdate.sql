@@ -31,13 +31,13 @@ CREATE TABLE m_sys_query_parameter
 	)
 	;
 CREATE TABLE m_sys_parameter_validator
-	(ID INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT m_sys_query_parameter_PK PRIMARY KEY,
+	(ID INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT m_sys_parameter_validator_PK PRIMARY KEY,
 	parameter_id int,/*参数的ID，对应了m_sys_query_parameter.id*/
 	validator_type VARCHAR(200)/*验证器的类型，根据本类型可以知道是哪个验证器*/
 	)
 	;	
 CREATE TABLE m_sys_parameter_validator_data
-	(ID INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT m_sys_query_parameter_PK PRIMARY KEY,
+	(ID INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT m_sys_parameter_validator_data_PK PRIMARY KEY,
 	validator_id int,/*验证器ID，对应了m_sys_parameter_validator.id*/
 	data_key VARCHAR(200),/*验证规则的数据的key*/
 	data_value VARCHAR(200)/*验证规则的数据的值*/

@@ -34,6 +34,7 @@ import com.yesmynet.database.query.core.dto.Query;
 import com.yesmynet.database.query.core.dto.QueryDefinition;
 import com.yesmynet.database.query.core.dto.QueryReult;
 import com.yesmynet.database.query.core.service.DataSourceService;
+import com.yesmynet.database.query.core.service.ParameterValidatorDefine;
 import com.yesmynet.database.query.core.service.QueryDefinitionService;
 import com.yesmynet.database.query.core.service.QueryExecutorService;
 import com.yesmynet.database.query.core.service.QueryRenderService;
@@ -196,9 +197,11 @@ public class QueryController
 	    {
 	        queryParameters = queryDefinitionService.getQueryParameters(queryId);
 	    }
+	    List<ParameterValidatorDefine> allValidatorDefines = queryDefinitionService.getAllValidatorDefines();
 	    
 	    model.addAttribute("allHtmlTypes", ParameterHtmlType.values());
 	    model.addAttribute("query", queryParameters);
+	    model.addAttribute("allValidatorDefines",allValidatorDefines);
 	    return "editQuery";
 	}
 	/**

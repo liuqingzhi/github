@@ -22,6 +22,7 @@
 						<th>css class</th>
 						<th>参数描述</th>
 						<th>参数html类型</th>
+						<th>参数验证器</th>
 					</tr>
 					<#if (query.parameters)?exists>
 	    			<#list query.parameters as param>
@@ -52,6 +53,11 @@
 						        <option value="${htmlType1}" <#if (param.parameterInput.htmlType)?exists && param.parameterInput.htmlType==htmlType1>selected</#if>>${htmlType1.title}</option>
 						        </#list>
 						    </select>
+	    				</td>
+	    				<td>
+	    					<#list allValidatorDefines as validatorDefine>
+					        <option value="${validatorDefine.validatorType}" >${validatorDefine.name}</option>
+					        </#list>
 	    				</td>
 	    			</tr>	
 	    			</#list>

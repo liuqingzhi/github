@@ -23,6 +23,7 @@
         <result property="parameterInput.customName"  column="custom_Name"/>
         <result property="parameterInput.style"  column="style"/>
         <result property="parameterInput.styleClass"  column="style_class"/>
+        <result property="parameterValidatorRecordDtos" column="id" select="getParameterValidatorByParameterId" />
     </resultMap>
 	<!--得到参数使用的验证器-->
 	<resultMap id="parameterValidatorRecordDtoResult" class="com.yesmynet.database.query.core.dto.ParameterValidatorRecordDto">
@@ -32,7 +33,7 @@
         <result property="validatorDatas" column="id" select="getParameterValidatorData" />
     </resultMap>
     <!--得到参数使用的验证器的数据-->
-    <resultMap id=ParameterValidatorRecordDataResult" class="java.util.HashMap">  
+    <resultMap id="ParameterValidatorRecordDataResult" class="java.util.HashMap">  
 		<result property="key" column="data_key"/>  
 		<result property="value" column="data_value"/>  
 	</resultMap>  
@@ -123,14 +124,15 @@
 		values
 		(#validatorId:INTEGER#,#dataKey:VARCHAR#,#dataValue:VARCHAR#)
 	</insert>
+	<!--根据参数ID得到参数使用的所有验证器-->
+    <select id="getParameterValidatorByParameterId" resultMap="parameterValidatorRecordDtoResult" parameterClass="java.util.Map">
+       	select * From m_sys_parameter_validator 
+		where parameter_id=#parameterId:INTEGER#
+	</select>
 	<!--得到参数使用的验证器-->
     <select id="getParameterValidator" resultMap="parameterValidatorRecordDtoResult" parameterClass="java.util.Map">
        	select * From m_sys_parameter_validator 
 		where parameter_id=#parameterId:INTEGER# and validator_type=#validatorType:VARCHAR#
-    </select>
-	<!--得到参数使用的验证器的数据-->
-    <select id="getParameterValidatorData" resultMap="ParameterValidatorRecordDataResult"　parameterClass="java.lang.String">
-       	select t1.* From m_sys_parameter_validator_data t1
-		where t1.validator_id=#value#
-    </select>
+	</select>
+	
 </sqlMap>

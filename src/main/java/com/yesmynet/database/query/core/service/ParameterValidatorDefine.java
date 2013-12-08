@@ -63,27 +63,6 @@ public abstract class ParameterValidatorDefine extends SqlMapClientDaoSupport
     	return re;
     }
     /**
-     * 以html展示这个验证器的设置界面。
-     * @param validateRuleDatas 所有的参数
-     * @return
-     * @author 刘庆志
-     */
-    public String showHtml(String parameterId)
-    {
-    	Map<String,String> validateDatas;
-        List<ParameterInput> inputs = getInputs();
-        StringBuilder sb=new StringBuilder();
-        if(CollectionUtils.isEmpty(inputs))
-        {
-        	for(ParameterInput p:inputs)
-        	{
-        		sb.append(p.toHtml());
-        	}
-        }
-        
-        return sb.toString();
-    }
-    /**
      * 保存验证器的设置。
      * @param validateRuleDatas 用户提交的所有的参数
      * @return 保存是否成功 

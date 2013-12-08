@@ -38,6 +38,9 @@ public class ParameterRegularExpressionValidatorDefine extends ParameterValidato
         p1.setHtmlType(ParameterHtmlType.InputText);
         p1.setCustomName(PARAM_NAME_REGULAR_EXPRESSION);
         p1.setStyle("width: 100px; ");
+        
+        re.add(p1);
+        
 		return re;
 	}
 

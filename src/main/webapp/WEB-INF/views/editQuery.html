@@ -55,9 +55,29 @@
 						    </select>
 	    				</td>
 	    				<td>
-	    					<#list allValidatorDefines as validatorDefine>
-					        <option value="${validatorDefine.validatorType}" >${validatorDefine.name}</option>
-					        </#list>
+	    					<table>
+	    						<tr>
+	    							<th>验证器类型</th>
+	    							<th>验证器数据</th>
+	    						</tr>
+	    						<#if (param.parameterValidatorRecordDtos)?exists>
+		    					<#list param.parameterValidatorRecordDtos as parameterValidatorRecordDto>
+		    						<tr>
+		    							<td>
+				    						<select name="parameters[${param_index}].parameterValidatorRecordDtos[${parameterValidatorRecordDto_index}].validatorType">
+						    					<#list allValidatorDefines as validatorDefine>
+										        	<option value="${validatorDefine.validatorType}" <#if (parameterValidatorRecordDto.validatorType)?exists && parameterValidatorRecordDto.validatorType==validatorDefine.validatorType>selected</#if>>${validatorDefine.name}</option>
+										        </#list>
+									        </select>
+							        	</td>
+							        	<td>
+							        		${parameterValidatorRecordDto.showHtml}
+							        	</td>
+							        </tr>
+						        </#list>
+						        </#if>	
+	    					</table>
+	    					
 	    				</td>
 	    			</tr>	
 	    			</#list>
@@ -116,6 +136,9 @@
 					<#noparse>
 						    </select>
 	    				</td>
+						<td>
+							
+						</td>
 	    			</tr>
 				</#noparse>
 	</script>

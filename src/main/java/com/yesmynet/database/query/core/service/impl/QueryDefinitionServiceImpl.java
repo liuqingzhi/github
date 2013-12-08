@@ -13,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.yesmynet.database.query.core.dto.Parameter;
+import com.yesmynet.database.query.core.dto.ParameterValidatorRecordDto;
 import com.yesmynet.database.query.core.dto.Query;
 import com.yesmynet.database.query.core.dto.QueryDefinition;
 import com.yesmynet.database.query.core.service.ParameterValidatorDefine;
@@ -35,14 +36,98 @@ public class QueryDefinitionServiceImpl extends SqlMapClientDaoSupport implement
 		if(StringUtils.hasText(queryId))
 		{
 		    re=(QueryDefinition)this.getSqlMapClientTemplate().queryForObject("getQueryDefinitionById", queryId);
-		    
+		    settingParameterValidatorDefine(re);
 		}
 		else
 		{
 		    //re=getDefaultQuery();
 			re=defaultQueryInstance.getQueryDefinition();
 		}
-		
+		return re;
+	}
+	/**
+	 * 设置参数验证器
+	 * @param queryDefinition
+	 */
+	private void settingParameterValidatorDefine(QueryDefinition queryDefinition)
+	{
+		List<Parameter> parameters = queryDefinition.getParameters();
+		if(!CollectionUtils.isEmpty(parameters))
+		{
+			for(Parameter parameter:parameters)
+			{
+				String id = parameter.getId();
+				List<ParameterValidatorRecordDto> parameterValidators = getParameterValidators(id);
+				
+				parameter.setParameterValidatorRecordDtos(parameterValidators);
+			}
+		}	
+	}
+	/**
+	 * 根据参数ID得到参数使用的所有验证器定义
+	 * @param parameterId 参数ID
+	 * @return
+	 */
+	private List<ParameterValidatorRecordDto> getParameterValidators(String parameterId)
+	{
+		Map<String,String> params=new HashMap<String,String>();
+		params.put("parameterId", parameterId);
+		List<ParameterValidatorRecordDto> queryForList = this.getSqlMapClientTemplate().queryForList("getParameterValidator",params);
+		if(!CollectionUtils.isEmpty(queryForList))
+		{
+			for(ParameterValidatorRecordDto validator:queryForList)
+			{
+				String id = validator.getId();
+				Map<String, String> parameterValidatorDatas = getParameterValidatorDatas(id);
+				ParameterValidatorDefine parameterValidatorDefineByType = getParameterValidatorDefineByType(validator.getValidatorType());
+				
+				validator.setValidatorDatas(parameterValidatorDatas);
+				validator.setParameterValidatorDefine(parameterValidatorDefineByType);
+			}
+		}
+		return queryForList;
+	}
+	/**
+	 * 得到参数验证器使用的数据
+	 * @param queryDefinition
+	 */
+	private Map<String,String> getParameterValidatorDatas(String vallidatorId)
+	{
+		Map<String,String> re=new HashMap<String,String>();
+		Map<String,String> params=new HashMap<String,String>();
+		params.put("parameterValidatorId", vallidatorId);
+		List<Map<String,String>> queryForList = this.getSqlMapClientTemplate().queryForList("getParameterValidatorData",params);
+		if(!CollectionUtils.isEmpty(queryForList))
+		{
+			for(Map<String,String> map:queryForList)
+			{
+				String key = map.get("DATA_KEY");
+				String value = map.get("DATA_VALUE");
+				
+				re.put(key, value);
+			}
+		}
+		return re;
+	}
+	/**
+	 * 根据验证器类型得到验证器定义
+	 * @param type
+	 * @return
+	 */
+	private ParameterValidatorDefine getParameterValidatorDefineByType(String type)
+	{
+		ParameterValidatorDefine re=null;
+		if(StringUtils.hasText(type) && !CollectionUtils.isEmpty(parameterValidatorDefineList))
+		{
+			for(ParameterValidatorDefine v:parameterValidatorDefineList)
+			{
+				if(type.equals(v.getValidatorType()))
+				{
+					re=v;
+					break;
+				}
+			}
+		}
 		return re;
 	}
 	/**

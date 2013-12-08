@@ -23,20 +23,13 @@
         <result property="parameterInput.customName"  column="custom_Name"/>
         <result property="parameterInput.style"  column="style"/>
         <result property="parameterInput.styleClass"  column="style_class"/>
-        <result property="parameterValidatorRecordDtos" column="id" select="getParameterValidatorByParameterId" />
     </resultMap>
 	<!--得到参数使用的验证器-->
 	<resultMap id="parameterValidatorRecordDtoResult" class="com.yesmynet.database.query.core.dto.ParameterValidatorRecordDto">
         <result property="id"  column="id"/>
         <result property="parameterId"  column="parameter_id"/>
         <result property="validatorType"  column="validator_type"/>
-        <result property="validatorDatas" column="id" select="getParameterValidatorData" />
     </resultMap>
-    <!--得到参数使用的验证器的数据-->
-    <resultMap id="ParameterValidatorRecordDataResult" class="java.util.HashMap">  
-		<result property="key" column="data_key"/>  
-		<result property="value" column="data_value"/>  
-	</resultMap>  
     
 	<!--得到查询-->
     <select id="getQueryDefinitionById" resultMap="queryResult" parameterClass="java.lang.String">
@@ -124,15 +117,18 @@
 		values
 		(#validatorId:INTEGER#,#dataKey:VARCHAR#,#dataValue:VARCHAR#)
 	</insert>
-	<!--根据参数ID得到参数使用的所有验证器-->
-    <select id="getParameterValidatorByParameterId" resultMap="parameterValidatorRecordDtoResult" parameterClass="java.util.Map">
-       	select * From m_sys_parameter_validator 
-		where parameter_id=#parameterId:INTEGER#
-	</select>
 	<!--得到参数使用的验证器-->
     <select id="getParameterValidator" resultMap="parameterValidatorRecordDtoResult" parameterClass="java.util.Map">
        	select * From m_sys_parameter_validator 
-		where parameter_id=#parameterId:INTEGER# and validator_type=#validatorType:VARCHAR#
+		where parameter_id=#parameterId:INTEGER# 
+		<isNotEmpty property="validatorType" prepend="">
+			and validator_type=#validatorType:VARCHAR#
+		</isNotEmpty>
 	</select>
-	
+	<!--根据参数验证器的得到验证器使用的数据-->
+    <select id="getParameterValidatorData" resultClass="java.util.HashMap" parameterClass="java.util.Map">
+       	select * From m_sys_parameter_validator_data 
+		where VALIDATOR_ID=#parameterValidatorId:INTEGER#
+	</select>
+		
 </sqlMap>
